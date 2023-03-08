@@ -140,7 +140,7 @@ class ConfigureLifecycle(BaseAction):
 
     :example:
 
-      .. code-block:: yaml
+    .. code-block:: yaml
 
             policies:
               - name: efs-apply-lifecycle
@@ -194,7 +194,7 @@ class LifecyclePolicy(Filter):
 
     :example:
 
-      .. code-block:: yaml
+    .. code-block:: yaml
 
             policies:
               - name: efs-filter-lifecycle
