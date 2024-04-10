@@ -1,8 +1,8 @@
 {
     "status_code": 200,
     "data": {
-        "HyperParameterTuningJobName": "matt-test-4",
-        "HyperParameterTuningJobArn": "arn:aws:sagemaker:us-east-1:644160558196:hyper-parameter-tuning-job/matt-test-4",
+        "HyperParameterTuningJobName": "c7n-test-4",
+        "HyperParameterTuningJobArn": "arn:aws:sagemaker:us-east-1:644160558196:hyper-parameter-tuning-job/c7n-test-4",
         "HyperParameterTuningJobConfig": {
             "Strategy": "Bayesian",
             "ResourceLimits": {
@@ -12,7 +12,7 @@
         },
         "TrainingJobDefinitions": [
             {
-                "DefinitionName": "matt-test-def",
+                "DefinitionName": "c7n-test-def",
                 "TuningObjective": {
                     "Type": "Maximize",
                     "MetricName": "validation:auc"

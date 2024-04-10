@@ -3,8 +3,8 @@
     "data": {
         "HyperParameterTuningJobSummaries": [
             {
-                "HyperParameterTuningJobName": "matt-test-4",
-                "HyperParameterTuningJobArn": "arn:aws:sagemaker:us-east-1:644160558196:hyper-parameter-tuning-job/matt-test-4",
+                "HyperParameterTuningJobName": "c7n-test-4",
+                "HyperParameterTuningJobArn": "arn:aws:sagemaker:us-east-1:644160558196:hyper-parameter-tuning-job/c7n-test-4",
                 "HyperParameterTuningJobStatus": "InProgress",
                 "Strategy": "Bayesian",
                 "CreationTime": {
