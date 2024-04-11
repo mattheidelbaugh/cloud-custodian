@@ -3,29 +3,29 @@
     "data": {
         "HyperParameterTuningJobSummaries": [
             {
-                "HyperParameterTuningJobName": "c7n-test-4",
-                "HyperParameterTuningJobArn": "arn:aws:sagemaker:us-east-1:644160558196:hyper-parameter-tuning-job/c7n-test-4",
+                "HyperParameterTuningJobName": "c7n-test",
+                "HyperParameterTuningJobArn": "arn:aws:sagemaker:us-east-1:644160558196:hyper-parameter-tuning-job/c7n-test",
                 "HyperParameterTuningJobStatus": "InProgress",
                 "Strategy": "Bayesian",
                 "CreationTime": {
                     "__class__": "datetime",
                     "year": 2024,
                     "month": 4,
-                    "day": 10,
-                    "hour": 10,
-                    "minute": 39,
-                    "second": 40,
-                    "microsecond": 517000
+                    "day": 11,
+                    "hour": 11,
+                    "minute": 50,
+                    "second": 39,
+                    "microsecond": 929000
                 },
                 "LastModifiedTime": {
                     "__class__": "datetime",
                     "year": 2024,
                     "month": 4,
-                    "day": 10,
-                    "hour": 10,
-                    "minute": 39,
-                    "second": 44,
-                    "microsecond": 895000
+                    "day": 11,
+                    "hour": 11,
+                    "minute": 50,
+                    "second": 43,
+                    "microsecond": 281000
                 },
                 "TrainingJobStatusCounters": {
                     "Completed": 0,

@@ -380,7 +380,6 @@ class Cluster(QueryResourceManager):
 @NotebookInstance.action_registry.register('tag')
 @SagemakerJob.action_registry.register('tag')
 @SagemakerTransformJob.action_registry.register('tag')
-@SagemakerHyperParameterTuningJob.action_registry.register('tag')
 @Model.action_registry.register('tag')
 class TagNotebookInstance(Tag):
     """Action to create tag(s) on a SageMaker resource
@@ -440,7 +439,6 @@ class TagNotebookInstance(Tag):
 @NotebookInstance.action_registry.register('remove-tag')
 @SagemakerJob.action_registry.register('remove-tag')
 @SagemakerTransformJob.action_registry.register('remove-tag')
-@SagemakerHyperParameterTuningJob.action_registry.register('remove-tag')
 @Model.action_registry.register('remove-tag')
 class RemoveTagNotebookInstance(RemoveTag):
     """Remove tag(s) from SageMaker resources

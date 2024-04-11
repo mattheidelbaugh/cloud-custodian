@@ -1,8 +1,8 @@
 {
     "status_code": 200,
     "data": {
-        "HyperParameterTuningJobName": "c7n-test-4",
-        "HyperParameterTuningJobArn": "arn:aws:sagemaker:us-east-1:644160558196:hyper-parameter-tuning-job/c7n-test-4",
+        "HyperParameterTuningJobName": "c7n-test",
+        "HyperParameterTuningJobArn": "arn:aws:sagemaker:us-east-1:644160558196:hyper-parameter-tuning-job/c7n-test",
         "HyperParameterTuningJobConfig": {
             "Strategy": "Bayesian",
             "ResourceLimits": {
@@ -60,6 +60,7 @@
                     "booster": "gbtree",
                     "csv_weights": "0",
                     "dsplit": "row",
+                    "eval_metric": "auc",
                     "grow_policy": "depthwise",
                     "lambda_bias": "0.0",
                     "max_bin": "256",
@@ -223,7 +224,7 @@
                         "RecordWrapperType": "None"
                     },
                     {
-                        "ChannelName": "validate",
+                        "ChannelName": "validation",
                         "DataSource": {
                             "S3DataSource": {
                                 "S3DataType": "S3Prefix",
@@ -245,7 +246,7 @@
                     "VolumeSizeInGB": 10
                 },
                 "StoppingCondition": {
-                    "MaxRuntimeInSeconds": 43200
+                    "MaxRuntimeInSeconds": 42300
                 },
                 "EnableNetworkIsolation": false,
                 "EnableInterContainerTrafficEncryption": false,
@@ -257,21 +258,21 @@
             "__class__": "datetime",
             "year": 2024,
             "month": 4,
-            "day": 10,
-            "hour": 10,
-            "minute": 39,
-            "second": 40,
-            "microsecond": 517000
+            "day": 11,
+            "hour": 11,
+            "minute": 50,
+            "second": 39,
+            "microsecond": 929000
         },
         "LastModifiedTime": {
             "__class__": "datetime",
             "year": 2024,
             "month": 4,
-            "day": 10,
-            "hour": 10,
-            "minute": 39,
-            "second": 44,
-            "microsecond": 895000
+            "day": 11,
+            "hour": 11,
+            "minute": 50,
+            "second": 43,
+            "microsecond": 281000
         },
         "TrainingJobStatusCounters": {
             "Completed": 0,
