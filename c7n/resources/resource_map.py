@@ -222,6 +222,7 @@ ResourceMap = {
   "aws.s3-storage-lens": "c7n.resources.s3control.StorageLens",
   "aws.sagemaker-auto-ml-job": "c7n.resources.sagemaker.SagemakerAutoMLJob",
   "aws.sagemaker-cluster": "c7n.resources.sagemaker.Cluster",
+  "aws.sagemaker-compilation-job": "c7n.resources.sagemaker.SagemakerCompilationJob",
   "aws.sagemaker-domain": "c7n.resources.sagemaker.SagemakerDomain",
   "aws.sagemaker-endpoint": "c7n.resources.sagemaker.SagemakerEndpoint",
   "aws.sagemaker-endpoint-config": "c7n.resources.sagemaker.SagemakerEndpointConfig",

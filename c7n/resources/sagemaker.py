@@ -182,6 +182,44 @@ class SagemakerAutoMLJob(QueryResourceManager):
         return super(SagemakerAutoMLJob, self).resources(query=query)
 
 
+class SagemakerCompilationJobDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
+@resources.register('sagemaker-compilation-job')
+class SagemakerCompilationJob(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_compilation_jobs', 'CompilationJobSummaries', None)
+        detail_spec = (
+            'describe_compilation_job', 'CompilationJobName', 'CompilationJobName', None)
+        arn = id = 'CompilationJobArn'
+        name = 'CompilationJobName'
+        date = 'CreationTime'
+        permission_prefix = 'sagemaker'
+        universal_taggable = object()
+
+    source_mapping = {'describe': SagemakerCompilationJobDescribe}
+
+    def __init__(self, ctx, data):
+        super(SagemakerCompilationJob, self).__init__(ctx, data)
+        self.queries = QueryFilter.parse(
+            self.data.get('query', [
+                {'StatusEquals': 'INPROGRESS'}]))
+
+    def resources(self, query=None):
+        for q in self.queries:
+            if q is None:
+                continue
+            query = query or {}
+            for k, v in q.items():
+                query[k] = v
+        return super(SagemakerCompilationJob, self).resources(query=query)
+
+
 class QueryFilter:
 
     JOB_FILTERS = ('StatusEquals', 'NameContains',)
@@ -849,6 +887,35 @@ class SagemakerAutoMLJobStop(BaseAction):
         for j in jobs:
             try:
                 client.stop_auto_ml_job(AutoMLJobName=j['AutoMLJobName'])
+            except client.exceptions.ResourceNotFound:
+                pass
+
+
+@SagemakerCompilationJob.action_registry.register('stop')
+class SagemakerCompilationJobStop(BaseAction):
+    """Stops a SageMaker Compilation job
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-compilation-job
+            resource: sagemaker-compilation-job
+            filters:
+              - CompilationJobName: ml-job-10
+            actions:
+              - stop
+    """
+    schema = type_schema('stop')
+    permissions = ('sagemaker:StopCompilationJob',)
+
+    def process(self, jobs):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+
+        for j in jobs:
+            try:
+                client.stop_compilation_job(CompilationJobName=j['CompilationJobName'])
             except client.exceptions.ResourceNotFound:
                 pass
 
