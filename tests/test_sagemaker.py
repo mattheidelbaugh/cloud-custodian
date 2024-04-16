@@ -614,7 +614,7 @@ class TestSagemakerCompilationJob(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_tag_sagemaker_compilation_job(self):
-        session_factory = self.record_flight_data("test_sagemaker_compilation_job_tag")
+        session_factory = self.replay_flight_data("test_sagemaker_compilation_job_tag")
         p = self.load_policy(
             {
                 "name": "tag-compilation-job",
