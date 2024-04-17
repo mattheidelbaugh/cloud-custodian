@@ -220,6 +220,44 @@ class SagemakerCompilationJob(QueryResourceManager):
         return super(SagemakerCompilationJob, self).resources(query=query)
 
 
+class SagemakerProcessingJobDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
+@resources.register('sagemaker-processing-job')
+class SagemakerProcessingJob(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_processing_jobs', 'ProcessingJobSummaries', None)
+        detail_spec = (
+            'describe_processing_job', 'ProcessingJobName', 'ProcessingJobName', None)
+        arn = id = 'ProcessingJobArn'
+        name = 'ProcessingJobName'
+        date = 'CreationTime'
+        permission_prefix = 'sagemaker'
+        universal_taggable = object()
+
+    source_mapping = {'describe': SagemakerProcessingJobDescribe}
+
+    def __init__(self, ctx, data):
+        super(SagemakerProcessingJob, self).__init__(ctx, data)
+        self.queries = QueryFilter.parse(
+            self.data.get('query', [
+                {'StatusEquals': 'InProgress'}]))
+
+    def resources(self, query=None):
+        for q in self.queries:
+            if q is None:
+                continue
+            query = query or {}
+            for k, v in q.items():
+                query[k] = v
+        return super(SagemakerProcessingJob, self).resources(query=query)
+
+
 class QueryFilter:
 
     JOB_FILTERS = ('StatusEquals', 'NameContains',)
@@ -916,6 +954,35 @@ class SagemakerCompilationJobStop(BaseAction):
         for j in jobs:
             try:
                 client.stop_compilation_job(CompilationJobName=j['CompilationJobName'])
+            except client.exceptions.ResourceNotFound:
+                pass
+
+
+@SagemakerProcessingJob.action_registry.register('stop')
+class SagemakerProcessingJobStop(BaseAction):
+    """Stops a Sagemaker Processing job
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-processing-job
+            resource: sagemaker-processing-job
+            filters:
+              - ProcessingJobName: ml-job-10
+            actions:
+              - stop
+    """
+    schema = type_schema('stop')
+    permissions = ('sagemaker:StopProcessingJob',)
+
+    def process(self, jobs):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+
+        for j in jobs:
+            try:
+                client.stop_processing_job(ProcessingJobName=j['ProcessingJobName'])
             except client.exceptions.ResourceNotFound:
                 pass
 

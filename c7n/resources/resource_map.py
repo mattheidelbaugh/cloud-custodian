@@ -226,6 +226,7 @@ ResourceMap = {
   "aws.sagemaker-domain": "c7n.resources.sagemaker.SagemakerDomain",
   "aws.sagemaker-endpoint": "c7n.resources.sagemaker.SagemakerEndpoint",
   "aws.sagemaker-endpoint-config": "c7n.resources.sagemaker.SagemakerEndpointConfig",
+  "aws.sagemaker-processing-job": "c7n.resources.sagemaker.SagemakerProcessingJob",
   "aws.sagemaker-job": "c7n.resources.sagemaker.SagemakerJob",
   "aws.sagemaker-model": "c7n.resources.sagemaker.Model",
   "aws.sagemaker-notebook": "c7n.resources.sagemaker.NotebookInstance",

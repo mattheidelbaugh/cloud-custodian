@@ -671,6 +671,79 @@ class TestSagemakerCompilationJob(BaseTest):
         self.assertEqual(job["CompilationJobStatus"], "STOPPING")
 
 
+class TestSagemakerProcessingJob(BaseTest):
+
+    def test_sagemaker_processing_job_query(self):
+        session_factory = self.replay_flight_data("test_sagemaker_processing_job_query")
+        p = self.load_policy(
+            {
+                "name": "query-processing-jobs",
+                "resource": "sagemaker-processing-job",
+                "query": [{"StatusEquals": "Failed"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_tag_sagemaker_processing_job(self):
+        session_factory = self.replay_flight_data("test_sagemaker_processing_job_tag")
+        p = self.load_policy(
+            {
+                "name": "tag-processing-job",
+                "resource": "sagemaker-processing-job",
+                "filters": [{"tag:JobTag": "absent"}],
+                "actions": [{"type": "tag", "key": "JobTag", "value": "JobTagValue"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region="us-east-1").client("sagemaker")
+        tags = client.list_tags(ResourceArn=resources[0]["ProcessingJobArn"])["Tags"]
+        self.assertEqual([tags[0]["Key"], tags[0]["Value"]], ["JobTag", "JobTagValue"])
+
+        p = self.load_policy(
+            {
+                "name": "remove-processing-job-tag",
+                "resource": "sagemaker-processing-job",
+                "filters": [{"tag:JobTag": "JobTagValue"}],
+                "actions": [{"type": "remove-tag", "tags": ["JobTag"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags(ResourceArn=resources[0]["ProcessingJobArn"])["Tags"]
+        assert "JobTag" not in [tag["Key"] for tag in tags]
+
+    def test_stop_sagemaker_processing_job(self):
+        session_factory = self.replay_flight_data("test_sagemaker_processing_job_stop")
+        client = session_factory(region="us-east-1").client("sagemaker")
+        p = self.load_policy(
+            {
+                "name": "stop-processing-job",
+                "resource": "sagemaker-processing-job",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "ProcessingJobName",
+                        "value": "c7n",
+                        "op": "contains",
+                    }
+                ],
+                "actions": [{"type": "stop"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        job = client.describe_processing_job(
+            ProcessingJobName=resources[0]["ProcessingJobName"]
+        )
+        self.assertEqual(job["ProcessingJobStatus"], "Stopping")
+
+
 class TestSagemakerEndpoint(BaseTest):
 
     def test_sagemaker_endpoints(self):
