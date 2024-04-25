@@ -496,6 +496,81 @@ class Cluster(QueryResourceManager):
     source_mapping = {'describe': SagemakerClusterDescribe}
 
 
+class SagemakerDataQualityJobDefinitionDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
+@resources.register('sagemaker-data-quality-job-definition')
+class SagemakerDataQualityJobDefinition(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_data_quality_job_definitions', 'JobDefinitionSummaries', None)
+        detail_spec = ('describe_data_quality_job_definition', 'JobDefinitionName',
+                       'MonitoringJobDefinitionName', None)
+        arn = id = 'JobDefinitionArn'
+        name = 'JobDefinitionName'
+        date = 'CreationTime'
+        cfn_type = 'AWS::SageMaker::DataQualityJobDefinition'
+        permission_prefix = 'sagemaker'
+        filter_name = 'EndpointName'
+        filter_type = 'scalar'
+        universal_taggable = object()
+
+    source_mapping = {'describe': SagemakerDataQualityJobDefinitionDescribe}
+
+
+class SagemakerModelExplainabilityJobDefinitionDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
+@resources.register('sagemaker-model-explainability-job-definition')
+class SagemakerModelExplainabilityJobDefinition(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_model_explainability_job_definitions', 'JobDefinitionSummaries', None)
+        detail_spec = ('describe_model_explainability_job_definition', 'JobDefinitionName',
+                       'MonitoringJobDefinitionName', None)
+        arn = id = 'JobDefinitionArn'
+        name = 'JobDefinitionName'
+        date = 'CreationTime'
+        cfn_type = 'AWS::SageMaker::ModelExplainabilityJobDefinition'
+        permission_prefix = 'sagemaker'
+        filter_name = 'EndpointName'
+        filter_type = 'scalar'
+        universal_taggable = object()
+
+    source_mapping = {'describe': SagemakerModelExplainabilityJobDefinitionDescribe}
+
+
+class SagemakerModelQualityJobDefinitionDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
+@resources.register('sagemaker-model-quality-job-definition')
+class SagemakerModelQualityJobDefinition(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_model_quality_job_definitions', 'JobDefinitionSummaries', None)
+        detail_spec = ('describe_model_quality_job_definition', 'JobDefinitionName',
+                       'MonitoringJobDefinitionName', None)
+        arn = id = 'JobDefinitionArn'
+        name = 'JobDefinitionName'
+        date = 'CreationTime'
+        cfn_type = 'AWS::SageMaker::ModelQualityJobDefinition'
+        permission_prefix = 'sagemaker'
+        filter_name = 'EndpointName'
+        filter_type = 'scalar'
+        universal_taggable = object()
+
+    source_mapping = {'describe': SagemakerModelQualityJobDefinitionDescribe}
+
+
 @SagemakerEndpoint.action_registry.register('tag')
 @SagemakerEndpointConfig.action_registry.register('tag')
 @NotebookInstance.action_registry.register('tag')
@@ -905,6 +980,93 @@ class SagemakerEndpointConfigDelete(BaseAction):
             try:
                 client.delete_endpoint_config(
                     EndpointConfigName=e['EndpointConfigName'])
+            except client.exceptions.ResourceNotFound:
+                pass
+
+
+@SagemakerDataQualityJobDefinition.action_registry.register('delete')
+class SagemakerDataQualityJobDefinitionDelete(BaseAction):
+    """Delete a SageMaker Data Quality Job Definition
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-sagemaker-data-quality-job-definition
+            resource: sagemaker-data-quality-job-definition
+            filters:
+              - JobDefinitionName: job-def-1
+            actions:
+              - delete
+    """
+    schema = type_schema('delete')
+    permissions = ('sagemaker:DeleteDataQualityJobDefinition',)
+
+    def process(self, job_definitions):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+        for j in job_definitions:
+            try:
+                client.delete_data_quality_job_definition(
+                    JobDefinitionName=j['JobDefinitionName'])
+            except client.exceptions.ResourceNotFound:
+                pass
+
+
+@SagemakerModelExplainabilityJobDefinition.action_registry.register('delete')
+class SagemakerModelExplainabilityJobDefinitionDelete(BaseAction):
+    """Delete a SageMaker Model Explainability Job Definition
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-sagemaker-model-explainability-job-definition
+            resource: sagemaker-model-explainability-job-definition
+            filters:
+              - JobDefinitionName: job-def-1
+            actions:
+              - delete
+    """
+    schema = type_schema('delete')
+    permissions = ('sagemaker:DeleteModelExplainabilityJobDefinition',)
+
+    def process(self, job_definitions):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+        for j in job_definitions:
+            try:
+                client.delete_model_explainability_job_definition(
+                    JobDefinitionName=j['JobDefinitionName'])
+            except client.exceptions.ResourceNotFound:
+                pass
+
+
+@SagemakerModelQualityJobDefinition.action_registry.register('delete')
+class SagemakerModelQualityJobDefinitionDelete(BaseAction):
+    """Delete a SageMaker Model Quality Job Definition
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-sagemaker-model-quality-job-definition
+            resource: sagemaker-model-quality-job-definition
+            filters:
+              - JobDefinitionName: job-def-1
+            actions:
+              - delete
+    """
+    schema = type_schema('delete')
+    permissions = ('sagemaker:DeleteModelQualityJobDefinition',)
+
+    def process(self, job_definitions):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+        for j in job_definitions:
+            try:
+                client.delete_model_quality_job_definition(
+                    JobDefinitionName=j['JobDefinitionName'])
             except client.exceptions.ResourceNotFound:
                 pass
 

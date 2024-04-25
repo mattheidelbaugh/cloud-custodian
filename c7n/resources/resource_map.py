@@ -223,9 +223,15 @@ ResourceMap = {
   "aws.sagemaker-auto-ml-job": "c7n.resources.sagemaker.SagemakerAutoMLJob",
   "aws.sagemaker-cluster": "c7n.resources.sagemaker.Cluster",
   "aws.sagemaker-compilation-job": "c7n.resources.sagemaker.SagemakerCompilationJob",
+  "aws.sagemaker-data-quality-job-definition":
+    "c7n.resources.sagemaker.SagemakerDataQualityJobDefinition",
   "aws.sagemaker-domain": "c7n.resources.sagemaker.SagemakerDomain",
   "aws.sagemaker-endpoint": "c7n.resources.sagemaker.SagemakerEndpoint",
   "aws.sagemaker-endpoint-config": "c7n.resources.sagemaker.SagemakerEndpointConfig",
+  "aws.sagemaker-model-explainability-job-definition":
+    "c7n.resources.sagemaker.SagemakerModelExplainabilityJobDefinition",
+  "aws.sagemaker-model-quality-job-definition":
+    "c7n.resources.sagemaker.SagemakerModelQualityJobDefinition",
   "aws.sagemaker-processing-job": "c7n.resources.sagemaker.SagemakerProcessingJob",
   "aws.sagemaker-job": "c7n.resources.sagemaker.SagemakerJob",
   "aws.sagemaker-model": "c7n.resources.sagemaker.Model",
