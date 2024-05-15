@@ -890,6 +890,7 @@ class IamUserTest(BaseTest):
             'name': 'key-chain',
             'resource': 'iam-user',
             'source': 'config',
+            # What is this and how does it work??
             'query': [
                 {'clause': "resourceId = 'AIDAIFSHVFT46NXYGWMEI'"}],
             'filters': [
@@ -1447,7 +1448,7 @@ class IamPolicy(BaseTest):
         p = self.load_policy({
             'name': 'delete-policy',
             'resource': 'iam-policy',
-            'query': [{'Name': 'Scope', 'Value': 'Local'}],
+            'query': [{'Scope': 'Local'}],
             'filters': [
                 {'AttachmentCount': 0},
                 {'type': 'value', 'key': 'DefaultVersionId', 'value': 'v1', 'op': 'ne'},
@@ -1470,15 +1471,21 @@ class IamPolicy(BaseTest):
 
     def test_iam_query_parser(self):
         qfilters = [
-            {'Name': 'Scope', 'Value': 'Local'},
-            {'Name': 'OnlyAttached', 'Value': True}]
+            {'Scope': 'Local'},
+            {'OnlyAttached': True}]
 
         self.assertEqual(qfilters, PolicyQueryParser.parse(qfilters))
-        self.assertRaises(
-            PolicyValidationError,
+        self.assertRaises(PolicyValidationError,
             PolicyQueryParser.parse,
-            {'Name': 'Scope', 'Value': ['All', 'Local']})
+            {'Scope': ['All', 'Local']})
+        self.assertRaises(PolicyValidationError,
+            PolicyQueryParser.parse,
+            {'OnlyAttached': 'True'})
+        self.assertRaises(PolicyValidationError,
+            PolicyQueryParser.parse,
+            [{'Filters': [{'Name': 'scope'}, {'Values': ['local']}]}])
 
+    # TODO does casting to list still work?
     def test_iam_has_allow_all_policies(self):
         session_factory = self.replay_flight_data("test_iam_policy_allow_all")
         self.patch(UnusedIamPolicies, "executor_factory", MainThreadExecutor)

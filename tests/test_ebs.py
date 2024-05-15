@@ -25,10 +25,18 @@ from c7n.testing import mock_datetime_now
 class SnapshotQueryParse(BaseTest):
 
     def test_query(self):
-        qfilters = [
-            {'Name': 'tag:Name', 'Values': ['Snapshot1']},
-            {'Name': 'status', 'Values': ['completed']}]
-        self.assertEqual(qfilters, QueryParser.parse(qfilters))
+        query = [
+                    {"Filters":
+                            [
+                                {'Name': 'tag:Name', 'Values': ['Snapshot1']},
+                                {'Name': 'status', 'Values': ['completed']}
+                            ]
+                    },
+                    {'OwnerIds': ['self', '123456789012']},
+                    {'SnapshotIds': 'snap-123abc'},
+                ]
+
+        self.assertEqual(query, QueryParser.parse(query))
 
     def test_invalid_query(self):
         self.assertRaises(
@@ -41,16 +49,21 @@ class SnapshotQueryParse(BaseTest):
             PolicyValidationError, QueryParser.parse, [{'X': 1}])
 
         self.assertRaises(
-            PolicyValidationError, QueryParser.parse, [
-                {'Name': 'status', 'Values': 'completed'}])
+            PolicyValidationError, QueryParser.parse, [{'Name': 'status', 'Values': 'completed'}])
 
         self.assertRaises(
             PolicyValidationError, QueryParser.parse, [
-                {'Name': 'status', 'Values': ['Completed']}])
+                {'Filters': [{'Name': 'status', 'Values': 'completed'}]}])
 
         self.assertRaises(
             PolicyValidationError, QueryParser.parse, [
-                {'Name': 'snapshot-id', 'Values': [1]}])
+                {'Filters': [{'Name': 'status', 'Values': ['Completed']}]}])
+
+        self.assertRaises(
+            PolicyValidationError, QueryParser.parse, [
+                {'Filters': [{'Name': 'snapshot-id', 'Values': [1]}]}])
+
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [{'Owner': 'self'}])
 
 
 class SnapshotErrorHandler(BaseTest):

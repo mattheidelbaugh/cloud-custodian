@@ -155,10 +155,10 @@ class CloudDirectory(QueryResourceManager):
     augment = universal_augment
 
     def resources(self, query=None):
-        query_filters = CloudDirectoryQueryParser.parse(self.data.get('query', []))
+        queries = CloudDirectoryQueryParser.parse(self.data.get('query', []))
         query = query or {}
-        if query_filters:
-            query['Filters'] = query_filters
+        for q in queries:
+            query.update(q)
         return super(CloudDirectory, self).resources(query=query)
 
 
@@ -222,9 +222,8 @@ class CloudDirectoryDisable(BaseAction):
 
 class CloudDirectoryQueryParser(QueryParser):
     QuerySchema = {
-        'name': str,
-        'directoryArn': str,
-        'state': str,
+        'state': ('ENABLED', 'DISABLED', 'DELETED'),
     }
 
     type_name = 'CloudDirectory'
+    multi_value = False

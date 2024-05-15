@@ -374,10 +374,10 @@ class UserSetBoundary(SetBoundary):
 class DescribePolicy(DescribeSource):
 
     def resources(self, query=None):
-        qfilters = PolicyQueryParser.parse(self.manager.data.get('query', []))
+        queries = PolicyQueryParser.parse(self.manager.data.get('query', []))
         query = query or {}
-        if qfilters:
-            query = {t['Name']: t['Value'] for t in qfilters}
+        for q in queries:
+            query.update(q)
         return super(DescribePolicy, self).resources(query=query)
 
     def get_resources(self, resource_ids, cache=True):
@@ -427,7 +427,6 @@ class PolicyQueryParser(QueryParser):
         'OnlyAttached': bool
     }
     multi_value = False
-    value_key = 'Value'
 
 
 @resources.register('iam-profile')

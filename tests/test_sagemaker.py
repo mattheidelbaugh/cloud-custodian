@@ -1,7 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
-
+from c7n.resources.sagemaker import SagemakerQueryParser, CompilationJobQueryParser
+from c7n.exceptions import PolicyValidationError
 import botocore.exceptions as b_exc
 
 
@@ -1401,3 +1402,55 @@ class TestModelQualityJobDefinition(BaseTest):
         self.assertEqual(len(resources), 1)
         tags = client.list_tags(ResourceArn=resources[0]["JobDefinitionArn"])["Tags"]
         self.assertEqual(len(tags), 0)
+
+
+class SagemakerQueryParse(BaseTest):
+
+    def test_query(self):
+        # TODO test these in policy
+        query = [
+                    {'StatusEquals': 'InProgress'},
+                    {'NameContains': 'c7n'},
+                    {'CreationTimeAfter': 1470968567.05},
+                    {'LastModifiedTimeBefore': '2022-09-15T17:15:20.000Z'}
+                ]
+        self.assertEqual(query, SagemakerQueryParser.parse(query))
+
+    def test_invalid_query(self):
+        self.assertRaises(
+            PolicyValidationError, SagemakerQueryParser.parse, {})
+
+        self.assertRaises(
+            PolicyValidationError, SagemakerQueryParser.parse, [None])
+
+        self.assertRaises(
+            PolicyValidationError, SagemakerQueryParser.parse, [{'X': 1}])
+
+        self.assertRaises(
+            PolicyValidationError, SagemakerQueryParser.parse, [
+                {'Name': 'StatusEquals', 'Values': ['InProgress']}])
+
+        self.assertRaises(
+            PolicyValidationError, SagemakerQueryParser.parse, [
+                {'StatusEquals': 'INPROGRESS'}])
+
+        self.assertRaises(
+            PolicyValidationError, SagemakerQueryParser.parse, [
+                {'StatusEquals': ['InProgress']}])
+
+
+class CompilationJobQueryParse(BaseTest):
+
+    def test_query(self):
+        query = [{'StatusEquals': 'FAILED'}, {'NameContains': 'test'}]
+        self.assertEqual(query, CompilationJobQueryParser.parse(query))
+
+    def test_invalid_query(self):
+
+        self.assertRaises(
+            PolicyValidationError, SagemakerQueryParser.parse, [
+                {'StatusEquals', 'InProgress'}])
+
+        self.assertRaises(
+            PolicyValidationError, SagemakerQueryParser.parse, [
+                {'StatusEquals': ['INPROGRESS', 'COMPLETED']}])
