@@ -1442,7 +1442,7 @@ class IamPolicyFilterUsage(BaseTest):
 
 
 class IamPolicy(BaseTest):
-
+    # TODO Note new error message in PR
     def test_iam_policy_delete(self):
         factory = self.replay_flight_data('test_iam_policy_delete')
         p = self.load_policy({
@@ -1470,22 +1470,36 @@ class IamPolicy(BaseTest):
             PolicyArn=resources[0]['Arn'])
 
     def test_iam_query_parser(self):
-        qfilters = [
+        queries = [
             {'Scope': 'Local'},
             {'OnlyAttached': True}]
 
-        self.assertEqual(qfilters, PolicyQueryParser.parse(qfilters))
+        self.assertEqual(queries, PolicyQueryParser.parse(queries))
+
         self.assertRaises(PolicyValidationError,
             PolicyQueryParser.parse,
             {'Scope': ['All', 'Local']})
+
+        self.assertRaises(PolicyValidationError,
+            PolicyQueryParser.parse,
+            {'scope': 'Local'})
+
         self.assertRaises(PolicyValidationError,
             PolicyQueryParser.parse,
             {'OnlyAttached': 'True'})
+
         self.assertRaises(PolicyValidationError,
             PolicyQueryParser.parse,
-            [{'Filters': [{'Name': 'scope'}, {'Values': ['local']}]}])
+            {'Name': 'Scope', 'Value': 'Local'})
 
-    # TODO does casting to list still work?
+        self.assertRaises(PolicyValidationError,
+            PolicyQueryParser.parse,
+            [{'Filters': [{'Name': 'Scope'}, {'Values': ['Local']}]}])
+
+        self.assertRaises(PolicyValidationError,
+            PolicyQueryParser.parse,
+            [{'Filters': [{'Name': 'Scope'}, {'Values': ['Local']}]}])
+
     def test_iam_has_allow_all_policies(self):
         session_factory = self.replay_flight_data("test_iam_policy_allow_all")
         self.patch(UnusedIamPolicies, "executor_factory", MainThreadExecutor)

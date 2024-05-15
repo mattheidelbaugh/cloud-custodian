@@ -154,9 +154,12 @@ class TestEMR(BaseTest):
 
 
 class TestEMRQueryParser(unittest.TestCase):
-
+    # TODO Multiple queries on the same value?
     def test_query(self):
         self.assertEqual(EMRQueryParser.parse([]), [])
+
+        query = [{'ClusterStates': 'RUNNING'}, {'CreatedBefore': '2022-02-23'}]
+        self.assertEqual(EMRQueryParser.parse(query), query)
 
         query = [{'ClusterStates': ['RUNNING', 'WAITING']}]
         self.assertEqual(EMRQueryParser.parse(query), query)
@@ -168,6 +171,8 @@ class TestEMRQueryParser(unittest.TestCase):
         self.assertEqual(EMRQueryParser.parse(query), query)
 
     def test_invalid_query(self):
+        self.assertRaises(PolicyValidationError, EMRQueryParser.parse, [{"tag:Test": "True"}])
+
         self.assertRaises(PolicyValidationError, EMRQueryParser.parse, [{"tag:ASV": None}])
 
         self.assertRaises(PolicyValidationError, EMRQueryParser.parse, [{"foo": "bar"}])

@@ -333,7 +333,7 @@ class TestPropagateSpotTags(BaseTest):
             {
                 "name": "ec2-spot",
                 "resource": "ec2",
-                "query": [{"InstanceIds": ["i-01db165f1452ef5e4"]}],
+                "query": [{"instance-id": "i-01db165f1452ef5e4"}],
                 "actions": [{"type": "propagate-spot-tags", "only_tags": ["Name"]}],
             },
             session_factory=session_factory,
@@ -1111,7 +1111,7 @@ class TestStop(BaseTest):
             {
                 "name": "ec2-test-stop-hibernate",
                 "resource": "ec2",
-                "query": [{"Filters": [{"Name": "tag-key", "Values": ["Testing"]}]}],
+                "query": [{"tag-key": "Testing"}],
                 "actions": [{"type": "stop", "hibernate": True}],
             },
             config={"region": "us-west-2"},
@@ -1596,6 +1596,11 @@ class TestSetInstanceProfile(BaseTest):
 class TestEC2QueryParser(unittest.TestCase):
 
     def test_query(self):
+        self.assertEqual(EC2QueryParser.parse([]), [])
+        x = EC2QueryParser.parse([{"instance-state-name": "running"}])
+        self.assertEqual(
+            x[0]['Filters'][0], {"Name": "instance-state-name", "Values": ["running"]}
+        )
         query = [
                     {'Filters':
                             [
@@ -1607,17 +1612,26 @@ class TestEC2QueryParser(unittest.TestCase):
                 ]
 
         self.assertEqual(EC2QueryParser.parse(query), query)
-        self.assertEqual(EC2QueryParser.parse([]), [])
+
+        self.assertEqual(
+            EC2QueryParser.parse([{"tag:ASV": "REALTIMEMSG"}]), [
+                {"Filters": [{"Name": "tag:ASV", "Values": ["REALTIMEMSG"]}]}])
 
     def test_invalid_query(self):
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{"tag:ASV": None}])
+
         self.assertRaises(
             PolicyValidationError, EC2QueryParser.parse, [
                 {'Filters': [{'instance-state-name': 'running'}]}])
+
         self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{'InstanceIds': None}])
+
         self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{'InstanceIds': [1]}])
+
         self.assertRaises(
             PolicyValidationError, EC2QueryParser.parse, [
                 {'Filters': [{'Name': 'architecture', 'Values': ['gothic']}]}])
+
         self.assertRaises(
             PolicyValidationError, EC2QueryParser.parse, [
                 {'Filters': [{'Name': 'instance-group-name', 'Values': [False]}]}])
@@ -1717,7 +1731,7 @@ class TestOffHoursFilter(BaseTest):
                 {
                     "name": "ec2-offhours",
                     "resource": "ec2",
-                    "query": [{"Filters": [{"Name": "tag-key", "Values": ["c7n_test"]}]}],
+                    "query": [{"tag-key": "c7n_test"}],
                     "filters": [
                         {
                             "type": "offhour",
@@ -1747,7 +1761,7 @@ class TestOffHoursFilter(BaseTest):
                 {
                     "name": "ec2-offhours",
                     "resource": "ec2",
-                    "query": [{"Filters": [{"Name": "tag-key", "Values": ["c7n_test"]}]}],
+                    "query": [{"tag-key": "c7n_test"}],
                     "filters": [
                         {
                             "type": "offhour",
@@ -1781,7 +1795,7 @@ class TestOnHoursFilter(BaseTest):
                 {
                     "name": "ec2-onhours",
                     "resource": "ec2",
-                    "query": [{"Filters": [{"Name": "tag-key", "Values": ["c7n_test"]}]}],
+                    "query": [{"tag-key": "c7n_test"}],
                     "filters": [
                         {
                             "type": "onhour",
@@ -1811,7 +1825,7 @@ class TestOnHoursFilter(BaseTest):
                 {
                     "name": "ec2-onhours",
                     "resource": "ec2",
-                    "query": [{"Filters": [{"Name": "tag-key", "Values": ["c7n_test"]}]}],
+                    "query": [{"tag-key": "c7n_test"}],
                     "filters": [
                         {
                             "type": "onhour",
@@ -2080,7 +2094,7 @@ class TestModifySecurityGroupAction(BaseTest):
             "name": "add-remove-sg-with-name",
             "resource": "ec2",
             "query": [
-                {'InstanceIds': ["i-094207d64930768dc"]}],
+                {'instance-id': "i-094207d64930768dc"}],
             "actions": [
                 {"type": "modify-security-groups",
                  "remove": ["launch-wizard-1"],
@@ -2105,7 +2119,7 @@ class TestModifySecurityGroupAction(BaseTest):
             "name": "add-remove-sg-with-name",
             "resource": "ec2",
             "query": [
-                {"Filters": [{"Name": "instance-id", "Values": ["i-08797f38d2e80c9d0"]}]}],
+                {'instance-id': "i-08797f38d2e80c9d0"}],
             "actions": [
                 {"type": "modify-security-groups",
                  "add-by-tag": {

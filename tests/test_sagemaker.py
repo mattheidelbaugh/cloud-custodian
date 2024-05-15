@@ -1,8 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
+
 from c7n.resources.sagemaker import SagemakerQueryParser, CompilationJobQueryParser
 from c7n.exceptions import PolicyValidationError
+
 import botocore.exceptions as b_exc
 
 
@@ -1407,7 +1409,6 @@ class TestModelQualityJobDefinition(BaseTest):
 class SagemakerQueryParse(BaseTest):
 
     def test_query(self):
-        # TODO test these in policy
         query = [
                     {'StatusEquals': 'InProgress'},
                     {'NameContains': 'c7n'},
@@ -1437,6 +1438,10 @@ class SagemakerQueryParse(BaseTest):
         self.assertRaises(
             PolicyValidationError, SagemakerQueryParser.parse, [
                 {'StatusEquals': ['InProgress']}])
+
+        self.assertRaises(
+            PolicyValidationError, SagemakerQueryParser.parse, [
+                {'CreationTimeAfter': 1}])
 
 
 class CompilationJobQueryParse(BaseTest):

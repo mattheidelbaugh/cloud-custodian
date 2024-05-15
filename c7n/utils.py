@@ -742,12 +742,39 @@ class QueryParser:
     multi_value = True
 
     @classmethod
+    def is_implicit_query_filter(cls, data):
+        if not isinstance(data[0], dict):
+            raise PolicyValidationError("%s Query Invalid %s" % (cls.type_name, data))
+
+        key = list(data[0].keys())[0]
+        if (key not in cls.QuerySchema and 'Filters' in cls.QuerySchema and
+                (key in cls.QuerySchema.get('Filters', {}) or key.startswith('tag:'))):
+            return True
+        return False
+
+    @classmethod
+    def implicit_qfilter_translate(cls, data):
+        filters = []
+        for d in data:
+            key = list(d.keys())[0]
+            values = list(d.values())[0]
+            if not isinstance(values, list):
+                values = [values]
+            filters.append({'Name': key, 'Values': values})
+        return [{'Filters': filters}]
+
+    @classmethod
     def parse(cls, data):
         if not isinstance(data, (tuple, list)):
             raise PolicyValidationError(
                 "%s Query Invalid Format, must be array of dicts %s" % (
                     cls.type_name,
                     data))
+
+        # Check for query filters not listed under 'Filters' key for backwards compatibility
+        if data and cls.is_implicit_query_filter(data):
+            data = cls.implicit_qfilter_translate(data)
+
         for d in data:
             if not isinstance(d, dict):
                 raise PolicyValidationError("%s Query Invalid %s" % (cls.type_name, d))
@@ -783,7 +810,6 @@ class QueryParser:
             values = f['Values']
 
             if not isinstance(values, list):
-                # should we automatically wrap in a list here to accept lists and single values?
                 raise PolicyValidationError(
                     "%s Query Filter Invalid Key: Value:%s Must be list" % (
                         cls.type_name, key))
