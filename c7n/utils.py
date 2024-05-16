@@ -827,11 +827,6 @@ class QueryParser:
             key = f['Name']
             values = f['Values']
 
-            if not isinstance(values, list):
-                raise PolicyValidationError(
-                    "%s Query Filter Invalid Key: Value:%s Must be list" % (
-                        cls.type_name, key))
-
             if key not in cls.QuerySchema["Filters"] and not key.startswith('tag:'):
                 raise PolicyValidationError(
                     "%s Query Filter Invalid Key:%s Valid: %s" % (
