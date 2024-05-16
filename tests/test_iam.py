@@ -1442,7 +1442,6 @@ class IamPolicyFilterUsage(BaseTest):
 
 
 class IamPolicy(BaseTest):
-    # TODO Note new error message in PR
     def test_iam_policy_delete(self):
         factory = self.replay_flight_data('test_iam_policy_delete')
         p = self.load_policy({
@@ -1496,7 +1495,7 @@ class IamPolicy(BaseTest):
 
         self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
                           [{'Scope': 'Local'}, {'Scope': 'All'}])
-
+        
     def test_iam_has_allow_all_policies(self):
         session_factory = self.replay_flight_data("test_iam_policy_allow_all")
         self.patch(UnusedIamPolicies, "executor_factory", MainThreadExecutor)

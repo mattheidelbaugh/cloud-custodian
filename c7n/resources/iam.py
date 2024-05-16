@@ -378,6 +378,8 @@ class DescribePolicy(DescribeSource):
         query = query or {}
         for q in queries:
             query.update(q)
+        if 'Scope' not in query:
+            query['Scope'] = 'Local'
         return super(DescribePolicy, self).resources(query=query)
 
     def get_resources(self, resource_ids, cache=True):
@@ -402,7 +404,7 @@ class Policy(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'iam'
         arn_type = 'policy'
-        enum_spec = ('list_policies', 'Policies', {'Scope': 'Local'})
+        enum_spec = ('list_policies', 'Policies', None)
         id = 'PolicyId'
         name = 'PolicyName'
         date = 'CreateDate'
