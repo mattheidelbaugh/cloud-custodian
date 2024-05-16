@@ -55,13 +55,14 @@ class TestHealthQueryParser(BaseTest):
         self.assertEqual(HealthQueryParser.parse([]), [])
 
         query = [{'availabilityZones': 'us-east-1a'}, {'services': 'EC2'}]
-        self.assertEqual(HealthQueryParser.parse(query), query)
+        result_query = [{'availabilityZones': ['us-east-1a']}, {'services': ['EC2']}]
+        self.assertEqual(HealthQueryParser.parse(query), result_query)
 
         query = [{'eventStatusCodes': ['open', 'upcoming']}]
         self.assertEqual(HealthQueryParser.parse(query), query)
 
         query = [{"eventTypeCategories": 'issue'}]
-        self.assertEqual(HealthQueryParser.parse(query), query)
+        self.assertEqual(HealthQueryParser.parse(query), [{"eventTypeCategories": ['issue']}])
 
     def test_invalid_query(self):
         self.assertRaises(PolicyValidationError, HealthQueryParser.parse, [{"tag:Test": "True"}])

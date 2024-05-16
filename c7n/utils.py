@@ -786,20 +786,20 @@ class QueryParser:
             if d.get("Filters"):
                 results.append({"Filters": cls.parse_qfilters(d["Filters"])})
             else:
-                q_key, q_value = cls.parse_query(d)
+                key, value = cls.parse_query(d)
 
                 # Allow for multiple queries with the same key
-                if q_key in names and cls.multi_value:
-                    for q in results:
-                        if list(q.keys())[0] == q_key:
-                            q[q_key].append(d[q_key])
-                elif q_key in names and (not cls.multi_value or
-                                         cls.QuerySchema.get(q_key) == 'date'):
+                if key in names and (not cls.multi_value or
+                                         cls.QuerySchema.get(key) == 'date'):
                     raise PolicyValidationError(
-                        "%s Query Invalid Key: %s Must be unique" % (cls.type_name, q_key))
+                        "%s Query Invalid Key: %s Must be unique" % (cls.type_name, key))
+                elif key in names and cls.multi_value:
+                    for q in results:
+                        if list(q.keys())[0] == key:
+                            q[key].append(d[key])
                 else:
-                    names.add(q_key)
-                    results.append({q_key: q_value})
+                    names.add(key)
+                    results.append({key: value})
 
         return results
 
@@ -837,14 +837,14 @@ class QueryParser:
                     "%s Query Filter Invalid Key:%s Valid: %s" % (
                         cls.type_name, key, ", ".join(cls.QuerySchema.keys())))
 
-            vtype = cls.QuerySchema["Filters"].get(key)
-            if vtype is None and key.startswith('tag'):
-                vtype = str
-
             if not isinstance(values, list):
                 raise PolicyValidationError(
                     "%s Query Filter Invalid Values, must be array %s" % (
                         cls.type_name, data,))
+
+            vtype = cls.QuerySchema["Filters"].get(key)
+            if vtype is None and key.startswith('tag'):
+                vtype = str
 
             for v in values:
                 cls.type_check(vtype, v)

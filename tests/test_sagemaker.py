@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 
-from c7n.resources.sagemaker import SagemakerQueryParser, CompilationJobQueryParser
+from c7n.resources.sagemaker import SagemakerJobQueryParser, CompilationJobQueryParser
 from c7n.exceptions import PolicyValidationError
 
 import botocore.exceptions as b_exc
@@ -1406,7 +1406,7 @@ class TestModelQualityJobDefinition(BaseTest):
         self.assertEqual(len(tags), 0)
 
 
-class SagemakerQueryParse(BaseTest):
+class SagemakerJobQueryParse(BaseTest):
 
     def test_query(self):
         query = [
@@ -1415,32 +1415,32 @@ class SagemakerQueryParse(BaseTest):
                     {'CreationTimeAfter': 1470968567.05},
                     {'LastModifiedTimeBefore': '2022-09-15T17:15:20.000Z'}
                 ]
-        self.assertEqual(query, SagemakerQueryParser.parse(query))
+        self.assertEqual(query, SagemakerJobQueryParser.parse(query))
 
     def test_invalid_query(self):
         self.assertRaises(
-            PolicyValidationError, SagemakerQueryParser.parse, {})
+            PolicyValidationError, SagemakerJobQueryParser.parse, {})
 
         self.assertRaises(
-            PolicyValidationError, SagemakerQueryParser.parse, [None])
+            PolicyValidationError, SagemakerJobQueryParser.parse, [None])
 
         self.assertRaises(
-            PolicyValidationError, SagemakerQueryParser.parse, [{'X': 1}])
+            PolicyValidationError, SagemakerJobQueryParser.parse, [{'X': 1}])
 
         self.assertRaises(
-            PolicyValidationError, SagemakerQueryParser.parse, [
+            PolicyValidationError, SagemakerJobQueryParser.parse, [
                 {'Name': 'StatusEquals', 'Values': ['InProgress']}])
 
         self.assertRaises(
-            PolicyValidationError, SagemakerQueryParser.parse, [
+            PolicyValidationError, SagemakerJobQueryParser.parse, [
                 {'StatusEquals': 'INPROGRESS'}])
 
         self.assertRaises(
-            PolicyValidationError, SagemakerQueryParser.parse, [
+            PolicyValidationError, SagemakerJobQueryParser.parse, [
                 {'StatusEquals': ['InProgress']}])
 
         self.assertRaises(
-            PolicyValidationError, SagemakerQueryParser.parse, [
+            PolicyValidationError, SagemakerJobQueryParser.parse, [
                 {'CreationTimeAfter': 1}])
 
 
@@ -1453,9 +1453,9 @@ class CompilationJobQueryParse(BaseTest):
     def test_invalid_query(self):
 
         self.assertRaises(
-            PolicyValidationError, SagemakerQueryParser.parse, [
+            PolicyValidationError, SagemakerJobQueryParser.parse, [
                 {'StatusEquals', 'InProgress'}])
 
         self.assertRaises(
-            PolicyValidationError, SagemakerQueryParser.parse, [
+            PolicyValidationError, SagemakerJobQueryParser.parse, [
                 {'StatusEquals': ['INPROGRESS', 'COMPLETED']}])
