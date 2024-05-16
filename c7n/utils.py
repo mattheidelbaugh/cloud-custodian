@@ -775,6 +775,8 @@ class QueryParser:
         if data and cls.is_implicit_query_filter(data):
             data = cls.implicit_qfilter_translate(data)
 
+        results = []
+        names = set()
         for d in data:
             if not isinstance(d, dict):
                 raise PolicyValidationError("%s Query Invalid %s" % (cls.type_name, d))
@@ -782,19 +784,35 @@ class QueryParser:
                 raise PolicyValidationError("Query Invalid %s" % d)
 
             if d.get("Filters"):
-                cls.parse_qfilter(d["Filters"])
+                results.append({"Filters": cls.parse_qfilters(d["Filters"])})
             else:
-                cls.parse_query(d)
+                q_key, q_value = cls.parse_query(d)
 
-        return data
+                # Allow for multiple queries with the same key
+                if q_key in names and cls.multi_value:
+                    for q in results:
+                        if list(q.keys())[0] == q_key:
+                            q[q_key].append(d[q_key])
+                elif q_key in names and (not cls.multi_value or
+                                         cls.QuerySchema.get(q_key) == 'date'):
+                    raise PolicyValidationError(
+                        "%s Query Invalid Key: %s Must be unique" % (cls.type_name, q_key))
+                else:
+                    names.add(q_key)
+                    results.append({q_key: q_value})
+
+        return results
 
     @classmethod
-    def parse_qfilter(cls, data):
+    def parse_qfilters(cls, data):
         if not isinstance(data, (tuple, list)):
             raise PolicyValidationError(
                 "%s Query Filter Invalid Format, must be array of dicts %s" % (
                     cls.type_name,
                     data))
+
+        results = []
+        names = set()
         for f in data:
             if not isinstance(f, dict):
                 raise PolicyValidationError(
@@ -829,31 +847,31 @@ class QueryParser:
                         cls.type_name, data,))
 
             for v in values:
-                if isinstance(vtype, tuple):
-                    if v not in vtype:
-                        raise PolicyValidationError(
-                            "%s Query Filter Invalid Value: %s Valid: %s" % (
-                                cls.type_name, v, ", ".join(vtype)))
-                elif isinstance(vtype, str):
-                    if not parse_date(v):
-                        raise PolicyValidationError(
-                            "%s Query Filter Invalid Date Value: %s" % (
-                                cls.type_name, v))
-                elif not isinstance(v, vtype):
-                    raise PolicyValidationError(
-                        "%s Query Filter Invalid Value Type %s" % (
-                            cls.type_name, data,))
+                cls.type_check(vtype, v)
+
+            # Allow for multiple queries with the same key
+            if key in names:
+                for qf in results:
+                    if qf['Name'] == key:
+                        qf['Values'].extend(values)
+            else:
+                names.add(key)
+                results.append({'Name': key, 'Values': values})
+
+        return results
 
     @classmethod
     def parse_query(cls, data):
         key = list(data.keys())[0]
         values = list(data.values())[0]
 
+        vtype = cls.QuerySchema.get(key)
+
         if not cls.multi_value and isinstance(values, list):
             raise PolicyValidationError(
                 "%s Query Invalid Key: Value:%s Must be single valued" % (
                     cls.type_name, key))
-        elif not isinstance(values, list):
+        elif cls.multi_value and not isinstance(values, list) and vtype != 'date':
             values = [values]
 
         if key not in cls.QuerySchema:
@@ -861,25 +879,30 @@ class QueryParser:
                 "%s Query Invalid Key:%s Valid: %s" % (
                     cls.type_name, key, ", ".join(cls.QuerySchema.keys())))
 
-        vtype = cls.QuerySchema.get(key)
-        if vtype is None:
-            vtype = str
+        if isinstance(values, list):
+            for v in values:
+                cls.type_check(vtype, v)
+        else:
+            cls.type_check(vtype, values)
 
-        for v in values:
-            if isinstance(vtype, tuple):
-                if v not in vtype:
-                    raise PolicyValidationError(
-                        "%s Query Invalid Value: %s Valid: %s" % (
-                            cls.type_name, v, ", ".join(vtype)))
-            elif isinstance(vtype, str):
-                if not parse_date(v):
-                    raise PolicyValidationError(
-                        "%s Query Invalid Date Value: %s" % (
-                            cls.type_name, v))
-            elif not isinstance(v, vtype):
+        return key, values
+
+    @classmethod
+    def type_check(cls, vtype, value):
+        if isinstance(vtype, tuple):
+            if value not in vtype:
                 raise PolicyValidationError(
-                    "%s Query Invalid Value Type %s" % (
-                        cls.type_name, data,))
+                    "%s Query Invalid Value: %s Valid: %s" % (
+                        cls.type_name, value, ", ".join(vtype)))
+        elif vtype == 'date':
+            if not parse_date(value):
+                raise PolicyValidationError(
+                    "%s Query Invalid Date Value: %s" % (
+                        cls.type_name, value))
+        elif not isinstance(value, vtype):
+            raise PolicyValidationError(
+                "%s Query Invalid Value Type %s" % (
+                    cls.type_name, value,))
 
 
 def get_annotation_prefix(s):

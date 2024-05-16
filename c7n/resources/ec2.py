@@ -2075,11 +2075,12 @@ class PropagateSpotTags(BaseAction):
 
 class EC2QueryParser(QueryParser):
 
-    # lots more to potentially add here https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2/client/describe_instances.html
+    # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2/client/describe_instances.html
     QuerySchema = {
         'Filters': {
             'architecture': ('i386', 'x86_64'),
             'availability-zone': str,
+            'ebs-optimized': str,
             'iam-instance-profile.arn': str,
             'image-id': str,
             'instance-id': str,
@@ -2091,8 +2092,11 @@ class EC2QueryParser(QueryParser):
                 'shutting-down',
                 'stopping',
                 'stopped'),
+            'instance-type': str,
             'instance.group-id': str,
             'instance.group-name': str,
+            'owner-id': str,
+            'platform': str,
             'tag-key': str,
             'tag-value': str,
             'tenancy': ('dedicated', 'default', 'host'),

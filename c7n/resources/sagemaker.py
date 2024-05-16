@@ -67,7 +67,7 @@ class SagemakerJob(QueryResourceManager):
 
     def __init__(self, ctx, data):
         super(SagemakerJob, self).__init__(ctx, data)
-        self.queries = SagemakerQueryParser.parse(
+        self.queries = SagemakerJobQueryParser.parse(
             self.data.get('query', [
                 {'StatusEquals': 'InProgress'}]))
 
@@ -108,7 +108,7 @@ class SagemakerTransformJob(QueryResourceManager):
 
     def __init__(self, ctx, data):
         super(SagemakerTransformJob, self).__init__(ctx, data)
-        self.queries = SagemakerQueryParser.parse(
+        self.queries = SagemakerJobQueryParser.parse(
             self.data.get('query', [
                 {'StatusEquals': 'InProgress'}]))
 
@@ -154,7 +154,7 @@ class SagemakerHyperParameterTuningJob(QueryResourceManager):
 
     def __init__(self, ctx, data):
         super(SagemakerHyperParameterTuningJob, self).__init__(ctx, data)
-        self.queries = SagemakerQueryParser.parse(
+        self.queries = SagemakerJobQueryParser.parse(
             self.data.get('query', [
                 {'StatusEquals': 'InProgress'}]))
 
@@ -196,7 +196,7 @@ class SagemakerAutoMLJob(QueryResourceManager):
 
     def __init__(self, ctx, data):
         super(SagemakerAutoMLJob, self).__init__(ctx, data)
-        self.queries = SagemakerQueryParser.parse(
+        self.queries = SagemakerJobQueryParser.parse(
             self.data.get('query', [
                 {'StatusEquals': 'InProgress'}]))
 
@@ -266,7 +266,7 @@ class SagemakerProcessingJob(QueryResourceManager):
 
     def __init__(self, ctx, data):
         super(SagemakerProcessingJob, self).__init__(ctx, data)
-        self.queries = SagemakerQueryParser.parse(
+        self.queries = SagemakerJobQueryParser.parse(
             self.data.get('query', [
                 {'StatusEquals': 'InProgress'}]))
 
@@ -277,7 +277,7 @@ class SagemakerProcessingJob(QueryResourceManager):
         return super(SagemakerProcessingJob, self).resources(query=query)
 
 
-class SagemakerQueryParser(QueryParser):
+class SagemakerJobQueryParser(QueryParser):
 
     QuerySchema = {
         'NameContains': str,
@@ -291,7 +291,7 @@ class SagemakerQueryParser(QueryParser):
     type_name = 'Sagemaker'
 
 
-class CompilationJobQueryParser(SagemakerQueryParser):
+class CompilationJobQueryParser(SagemakerJobQueryParser):
 
     QuerySchema = {
         'NameContains': str,

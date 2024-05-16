@@ -1478,27 +1478,24 @@ class IamPolicy(BaseTest):
 
         self.assertRaises(PolicyValidationError,
             PolicyQueryParser.parse,
-            {'Scope': ['All', 'Local']})
+            [{'Scope': ['All', 'Local']}])
 
-        self.assertRaises(PolicyValidationError,
-            PolicyQueryParser.parse,
-            {'scope': 'Local'})
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse, [{'scope': 'Local'}])
 
-        self.assertRaises(PolicyValidationError,
-            PolicyQueryParser.parse,
-            {'OnlyAttached': 'True'})
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'OnlyAttached': 'True'}])
 
-        self.assertRaises(PolicyValidationError,
-            PolicyQueryParser.parse,
-            {'Name': 'Scope', 'Value': 'Local'})
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'Name': 'Scope', 'Value': 'Local'}])
 
-        self.assertRaises(PolicyValidationError,
-            PolicyQueryParser.parse,
-            [{'Filters': [{'Name': 'Scope'}, {'Values': ['Local']}]}])
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'Filters': [{'Name': 'Scope'}, {'Values': ['Local']}]}])
 
-        self.assertRaises(PolicyValidationError,
-            PolicyQueryParser.parse,
-            [{'Filters': [{'Name': 'Scope'}, {'Values': ['Local']}]}])
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'Filters': [{'Name': 'Scope'}, {'Values': ['Local']}]}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'Scope': 'Local'}, {'Scope': 'All'}])
 
     def test_iam_has_allow_all_policies(self):
         session_factory = self.replay_flight_data("test_iam_policy_allow_all")

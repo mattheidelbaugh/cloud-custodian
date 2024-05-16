@@ -1617,6 +1617,10 @@ class TestEC2QueryParser(unittest.TestCase):
             EC2QueryParser.parse([{"tag:ASV": "REALTIMEMSG"}]), [
                 {"Filters": [{"Name": "tag:ASV", "Values": ["REALTIMEMSG"]}]}])
 
+        self.assertEqual(
+            EC2QueryParser.parse([{"tag:Test": "Value1"}, {"tag:Test": "Value2"}]),
+                [{"Filters": [{"Name": "tag:Test", "Values": ["Value1", "Value2"]}]}])
+
     def test_invalid_query(self):
         self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{"tag:ASV": None}])
 
@@ -1628,13 +1632,11 @@ class TestEC2QueryParser(unittest.TestCase):
 
         self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{'InstanceIds': [1]}])
 
-        self.assertRaises(
-            PolicyValidationError, EC2QueryParser.parse, [
-                {'Filters': [{'Name': 'architecture', 'Values': ['gothic']}]}])
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse,
+                          [{'Filters': [{'Name': 'architecture', 'Values': ['gothic']}]}])
 
-        self.assertRaises(
-            PolicyValidationError, EC2QueryParser.parse, [
-                {'Filters': [{'Name': 'instance-group-name', 'Values': [False]}]}])
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse,
+                          [{'Filters': [{'Name': 'instance-group-name', 'Values': [False]}]}])
 
 
 class TestTerminate(BaseTest):
