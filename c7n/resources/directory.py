@@ -145,7 +145,7 @@ class CloudDirectory(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = "clouddirectory"
-        enum_spec = ("list_directories", "Directories", {'state': 'ENABLED'})
+        enum_spec = ("list_directories", "Directories", None)
         arn = id = "DirectoryArn"
         name = "Name"
         arn_type = "directory"
@@ -159,6 +159,8 @@ class CloudDirectory(QueryResourceManager):
         query = query or {}
         for q in queries:
             query.update(q)
+        if 'state' not in query:
+            query['state'] = 'ENABLED'
         return super(CloudDirectory, self).resources(query=query)
 
 
