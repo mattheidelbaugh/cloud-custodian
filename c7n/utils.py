@@ -786,6 +786,7 @@ class QueryParser:
                 except KeyError:
                     raise PolicyValidationError(
                         "%s Query Invalid Format %s" % (cls.type_name, data))
+
             # Support ebs-snapshot 'Name', 'Values' queries without 'Filters' key
             elif data[0].get('Values'):
                 try:

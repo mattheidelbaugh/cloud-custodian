@@ -68,46 +68,40 @@ class SnapshotQueryParse(BaseTest):
         self.assertEqual(QueryParser.parse(query), result_query)
 
     def test_invalid_query(self):
-        self.assertRaises(
-            PolicyValidationError, QueryParser.parse, {})
+        self.assertRaises(PolicyValidationError, QueryParser.parse, {})
 
-        self.assertRaises(
-            PolicyValidationError, QueryParser.parse, [None])
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [None])
 
-        self.assertRaises(
-            PolicyValidationError, QueryParser.parse, [{'X': 1}])
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [{'X': 1}])
 
-        self.assertRaises(
-            PolicyValidationError, QueryParser.parse, [
-                {'Name': 'status', 'Values': 'completed'}])
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [
+            {'Name': 'status', 'Values': 'completed'}])
 
-        self.assertRaises(
-            PolicyValidationError, QueryParser.parse, [{'Name': 'status', 'Values': 'completed'}])
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [
+            {'Name': 'status', 'Values': 'completed'}])
 
-        self.assertRaises(
-            PolicyValidationError, QueryParser.parse, [
-                {'Name': 'status', 'Values': ['Completed']}])
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [
+            {'Name': 'status', 'Values': ['Completed']}])
 
-        self.assertRaises(
-            PolicyValidationError, QueryParser.parse, [
-                {'Filters': [{'Name': 'status', 'Values': 'completed'}]}])
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [
+            {'Filters': [{'Name': 'status', 'Values': 'completed'}]}])
 
-        self.assertRaises(
-            PolicyValidationError, QueryParser.parse, [
-                {'Name': 'snapshot-id', 'Values': [1]}])
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [
+            {'Name': 'snapshot-id', 'Values': [1]}])
 
-        self.assertRaises(
-            PolicyValidationError, QueryParser.parse, [
-                {'Filters': [{'Name': 'status', 'Values': ['Completed']}]}])
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [
+            {'Filters': [{'Name': 'status', 'Values': ['Completed']}]}])
 
-        self.assertRaises(
-            PolicyValidationError, QueryParser.parse, [
-                {'Filters': [{'Name': 'snapshot-id', 'Values': [1]}]}])
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [
+            {'Filters': [{'Name': 'snapshot-id', 'Values': [1]}]}])
 
         self.assertRaises(PolicyValidationError, QueryParser.parse, [{'Owner': 'self'}])
 
         self.assertRaises(PolicyValidationError, QueryParser.parse, [
             {'MaxResults': 1000}, {'MaxResults': 5000}])
+
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [
+            {'Name': 'status', 'Values': ['completed']}, {'snapshot-id': ['snap-123abc']}])
 
 
 class SnapshotErrorHandler(BaseTest):
