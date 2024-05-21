@@ -771,9 +771,28 @@ class QueryParser:
                     cls.type_name,
                     data))
 
-        # Check for query filters not listed under 'Filters' key for backwards compatibility
-        if data and cls.is_implicit_query_filter(data):
-            data = cls.implicit_qfilter_translate(data)
+        if data:
+            # Backwards compatibility
+
+            # Check for query filter key value pairs not listed under 'Filters' key
+            if cls.is_implicit_query_filter(data):
+                data = cls.implicit_qfilter_translate(data)
+
+            # Support iam-policy 'Name', 'Value' queries without 'Filters' key
+            if data[0].get('Value'):
+                try:
+                    data = [{d['Name']: d['Value']} for d in data]
+                except KeyError:
+                    raise PolicyValidationError(
+                        "%s Query Invalid Format %s" % (cls.type_name, data))
+            # Support ebs-snapshot 'Name', 'Values' queries without 'Filters' key
+            elif data[0].get('Values'):
+                try:
+                    qfilters = [{"Name": d['Name'], "Values": d['Values']} for d in data]
+                    data = [{"Filters": qfilters}]
+                except KeyError:
+                    raise PolicyValidationError(
+                        "%s Query Invalid Format %s" % (cls.type_name, data))
 
         results = []
         names = set()
@@ -827,7 +846,7 @@ class QueryParser:
             key = f['Name']
             values = f['Values']
 
-            if key not in cls.QuerySchema["Filters"] and not key.startswith('tag:'):
+            if key not in cls.QuerySchema.get("Filters", {}) and not key.startswith('tag:'):
                 raise PolicyValidationError(
                     "%s Query Filter Invalid Key:%s Valid: %s" % (
                         cls.type_name, key, ", ".join(cls.QuerySchema.keys())))

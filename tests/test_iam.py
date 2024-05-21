@@ -890,7 +890,6 @@ class IamUserTest(BaseTest):
             'name': 'key-chain',
             'resource': 'iam-user',
             'source': 'config',
-            # What is this and how does it work??
             'query': [
                 {'clause': "resourceId = 'AIDAIFSHVFT46NXYGWMEI'"}],
             'filters': [
@@ -1447,7 +1446,7 @@ class IamPolicy(BaseTest):
         p = self.load_policy({
             'name': 'delete-policy',
             'resource': 'iam-policy',
-            'query': [{'Scope': 'Local'}],
+            'query': [{'Name': 'Scope', 'Value': 'Local'}],
             'filters': [
                 {'AttachmentCount': 0},
                 {'type': 'value', 'key': 'DefaultVersionId', 'value': 'v1', 'op': 'ne'},
@@ -1475,17 +1474,23 @@ class IamPolicy(BaseTest):
 
         self.assertEqual(queries, PolicyQueryParser.parse(queries))
 
-        self.assertRaises(PolicyValidationError,
-            PolicyQueryParser.parse,
-            [{'Scope': ['All', 'Local']}])
+        queries = [{'Name': 'Scope', 'Value': 'Local'}, {'Name': 'OnlyAttached', 'Value': True}]
+        result_queries = [{'Scope': 'Local'}, {'OnlyAttached': True}]
+        self.assertEqual(result_queries, PolicyQueryParser.parse(queries))
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          {'Name': 'Scope', 'Value': ['All', 'Local']})
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'Name': 'Scope', 'Value': 'Local'}, {'OnlyAttached': True}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'Scope': ['All', 'Local']}])
 
         self.assertRaises(PolicyValidationError, PolicyQueryParser.parse, [{'scope': 'Local'}])
 
         self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
                           [{'OnlyAttached': 'True'}])
-
-        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
-                          [{'Name': 'Scope', 'Value': 'Local'}])
 
         self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
                           [{'Filters': [{'Name': 'Scope'}, {'Values': ['Local']}]}])
@@ -1495,7 +1500,7 @@ class IamPolicy(BaseTest):
 
         self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
                           [{'Scope': 'Local'}, {'Scope': 'All'}])
-        
+
     def test_iam_has_allow_all_policies(self):
         session_factory = self.replay_flight_data("test_iam_policy_allow_all")
         self.patch(UnusedIamPolicies, "executor_factory", MainThreadExecutor)

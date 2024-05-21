@@ -26,28 +26,43 @@ class SnapshotQueryParse(BaseTest):
 
     def test_query(self):
         query = [
-                    {"Filters":
-                            [
-                                {'Name': 'tag:Name', 'Values': ['Snapshot1']},
-                                {'Name': 'status', 'Values': ['completed']},
-                                {'Name': 'tag:Name', 'Values': ['Snapshot2']}
-                            ]
-                    },
-                    {'OwnerIds': ['self', '123456789012']},
-                    {'SnapshotIds': 'snap-123abc'},
+            {
+                "Filters": [
+                    {'Name': 'tag:Name', 'Values': ['Snapshot1']},
+                    {'Name': 'status', 'Values': ['completed']},
+                    {'Name': 'tag:Name', 'Values': ['Snapshot2']}
+                ]
+            },
+            {'OwnerIds': ['self', '123456789012']},
+            {'SnapshotIds': 'snap-123abc'},
+        ]
+
+        result_query = [
+            {
+                "Filters": [
+                        {'Name': 'tag:Name', 'Values': ['Snapshot1', 'Snapshot2']},
+                        {'Name': 'status', 'Values': ['completed']},
+                ]
+            },
+            {'OwnerIds': ['self', '123456789012']},
+            {'SnapshotIds': ['snap-123abc']},
+        ]
+        self.assertEqual(QueryParser.parse(query), result_query)
+
+        query = [
+                    {'Name': 'tag:Name', 'Values': ['Snapshot1']},
+                    {'Name': 'status', 'Values': ['completed']},
+                    {'Name': 'tag:Name', 'Values': ['Snapshot2']}
                 ]
 
         result_query = [
-                    {"Filters":
-                            [
-                                {'Name': 'tag:Name', 'Values': ['Snapshot1', 'Snapshot2']},
-                                {'Name': 'status', 'Values': ['completed']},
-                            ]
-                    },
-                    {'OwnerIds': ['self', '123456789012']},
-                    {'SnapshotIds': ['snap-123abc']},
+            {
+                "Filters": [
+                    {'Name': 'tag:Name', 'Values': ['Snapshot1', 'Snapshot2']},
+                    {'Name': 'status', 'Values': ['completed']},
                 ]
-
+            },
+        ]
         self.assertEqual(QueryParser.parse(query), result_query)
 
     def test_invalid_query(self):
@@ -66,6 +81,10 @@ class SnapshotQueryParse(BaseTest):
 
         self.assertRaises(
             PolicyValidationError, QueryParser.parse, [{'Name': 'status', 'Values': 'completed'}])
+
+        self.assertRaises(
+            PolicyValidationError, QueryParser.parse, [
+                {'Name': 'status', 'Values': ['Completed']}])
 
         self.assertRaises(
             PolicyValidationError, QueryParser.parse, [

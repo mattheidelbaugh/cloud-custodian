@@ -1635,6 +1635,8 @@ class TestEC2QueryParser(unittest.TestCase):
         self.assertRaises(PolicyValidationError, EC2QueryParser.parse,
                           [{'Filters': [{'Name': 'architecture', 'Values': ['gothic']}]}])
 
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{"tag:ASV": None}])
+
         self.assertRaises(PolicyValidationError, EC2QueryParser.parse,
                           [{'Filters': [{'Name': 'instance-group-name', 'Values': [False]}]}])
 

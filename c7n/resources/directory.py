@@ -223,6 +223,7 @@ class CloudDirectoryDisable(BaseAction):
 class CloudDirectoryQueryParser(QueryParser):
     QuerySchema = {
         'state': ('ENABLED', 'DISABLED', 'DELETED'),
+        'MaxResults': int,
     }
 
     type_name = 'CloudDirectory'

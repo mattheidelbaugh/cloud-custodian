@@ -177,9 +177,9 @@ class TestEMRQueryParser(unittest.TestCase):
     def test_invalid_query(self):
         self.assertRaises(PolicyValidationError, EMRQueryParser.parse, [{"tag:Test": "True"}])
 
-        self.assertRaises(PolicyValidationError, EMRQueryParser.parse, [{"tag:ASV": None}])
-
         self.assertRaises(PolicyValidationError, EMRQueryParser.parse, [{"foo": "bar"}])
+
+        self.assertRaises(PolicyValidationError, EMRQueryParser.parse, [{"tag:ASV": None}])
 
         self.assertRaises(
             PolicyValidationError, EMRQueryParser.parse, [{"too": "many", "keys": "error"}]
