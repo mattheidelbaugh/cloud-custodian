@@ -740,6 +740,7 @@ class QueryParser:
     QuerySchema = {}
     type_name = ''
     multi_value = True
+    single_value_types = ('date', int, bool)
 
     @classmethod
     def is_implicit_query_filter(cls, data):
@@ -809,7 +810,7 @@ class QueryParser:
 
                 # Allow for multiple queries with the same key
                 if key in names and (not cls.multi_value or
-                                         cls.QuerySchema.get(key) == 'date'):
+                                         cls.QuerySchema.get(key) in cls.single_value_types):
                     raise PolicyValidationError(
                         "%s Query Invalid Key: %s Must be unique" % (cls.type_name, key))
                 elif key in names and cls.multi_value:
@@ -885,7 +886,8 @@ class QueryParser:
             raise PolicyValidationError(
                 "%s Query Invalid Key: Value:%s Must be single valued" % (
                     cls.type_name, key))
-        elif cls.multi_value and not isinstance(values, list) and vtype != 'date':
+        elif (cls.multi_value and not isinstance(values, list)
+              and vtype not in cls.single_value_types):
             values = [values]
 
         if key not in cls.QuerySchema:

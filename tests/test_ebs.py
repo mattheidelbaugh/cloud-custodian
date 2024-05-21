@@ -35,6 +35,7 @@ class SnapshotQueryParse(BaseTest):
             },
             {'OwnerIds': ['self', '123456789012']},
             {'SnapshotIds': 'snap-123abc'},
+            {'MaxResults': 1000},
         ]
 
         result_query = [
@@ -46,14 +47,15 @@ class SnapshotQueryParse(BaseTest):
             },
             {'OwnerIds': ['self', '123456789012']},
             {'SnapshotIds': ['snap-123abc']},
+            {'MaxResults': 1000},
         ]
         self.assertEqual(QueryParser.parse(query), result_query)
 
         query = [
-                    {'Name': 'tag:Name', 'Values': ['Snapshot1']},
-                    {'Name': 'status', 'Values': ['completed']},
-                    {'Name': 'tag:Name', 'Values': ['Snapshot2']}
-                ]
+            {'Name': 'tag:Name', 'Values': ['Snapshot1']},
+            {'Name': 'status', 'Values': ['completed']},
+            {'Name': 'tag:Name', 'Values': ['Snapshot2']},
+        ]
 
         result_query = [
             {
@@ -103,6 +105,9 @@ class SnapshotQueryParse(BaseTest):
                 {'Filters': [{'Name': 'snapshot-id', 'Values': [1]}]}])
 
         self.assertRaises(PolicyValidationError, QueryParser.parse, [{'Owner': 'self'}])
+
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [
+            {'MaxResults': 1000}, {'MaxResults': 5000}])
 
 
 class SnapshotErrorHandler(BaseTest):

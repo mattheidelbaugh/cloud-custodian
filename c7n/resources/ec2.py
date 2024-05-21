@@ -2102,7 +2102,8 @@ class EC2QueryParser(QueryParser):
             'tenancy': ('dedicated', 'default', 'host'),
             'vpc-id': str
         },
-        'InstanceIds': str
+        'InstanceIds': str,
+        'MaxResults': int,
     }
 
     type_name = "EC2"

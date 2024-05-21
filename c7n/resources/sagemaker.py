@@ -286,6 +286,7 @@ class SagemakerJobQueryParser(QueryParser):
         'CreationTimeBefore': 'date',
         'LastModifiedTimeAfter': 'date',
         'LastModifiedTimeBefore': 'date',
+        'MaxResults': int,
     }
     multi_value = False
     type_name = 'Sagemaker'
@@ -300,6 +301,7 @@ class CompilationJobQueryParser(SagemakerJobQueryParser):
         'CreationTimeBefore': 'date',
         'LastModifiedTimeAfter': 'date',
         'LastModifiedTimeBefore': 'date',
+        'MaxResults': int,
     }
 
 

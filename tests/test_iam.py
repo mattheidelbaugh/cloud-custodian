@@ -1470,7 +1470,9 @@ class IamPolicy(BaseTest):
     def test_iam_query_parser(self):
         queries = [
             {'Scope': 'Local'},
-            {'OnlyAttached': True}]
+            {'OnlyAttached': True},
+            {'MaxItems': 100}
+        ]
 
         self.assertEqual(queries, PolicyQueryParser.parse(queries))
 
@@ -1500,6 +1502,9 @@ class IamPolicy(BaseTest):
 
         self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
                           [{'Scope': 'Local'}, {'Scope': 'All'}])
+
+        self.assertRaises(PolicyValidationError, PolicyQueryParser.parse,
+                          [{'MaxItems': '100'}])
 
     def test_iam_has_allow_all_policies(self):
         session_factory = self.replay_flight_data("test_iam_policy_allow_all")

@@ -426,7 +426,8 @@ class PolicyQueryParser(QueryParser):
         'Scope': ('All', 'AWS', 'Local'),
         'PolicyUsageFilter': ('PermissionsPolicy', 'PermissionsBoundary'),
         'PathPrefix': str,
-        'OnlyAttached': bool
+        'OnlyAttached': bool,
+        'MaxItems': int,
     }
     multi_value = False
 

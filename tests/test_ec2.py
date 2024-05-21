@@ -1602,14 +1602,15 @@ class TestEC2QueryParser(unittest.TestCase):
             x[0]['Filters'][0], {"Name": "instance-state-name", "Values": ["running"]}
         )
         query = [
-                    {'Filters':
-                            [
-                                {'Name': 'tag:Name', 'Values': ['Instance1']},
-                                {'Name': 'instance-state-name', 'Values': ['running']}
-                            ]
-                    },
-                    {'InstanceIds': ['i-123abc', 'i-abc123']},
-                ]
+            {'Filters':
+                    [
+                        {'Name': 'tag:Name', 'Values': ['Instance1']},
+                        {'Name': 'instance-state-name', 'Values': ['running']}
+                    ]
+            },
+            {'InstanceIds': ['i-123abc', 'i-abc123']},
+            {'MaxResults': 1000},
+        ]
 
         self.assertEqual(EC2QueryParser.parse(query), query)
 
@@ -1639,6 +1640,8 @@ class TestEC2QueryParser(unittest.TestCase):
 
         self.assertRaises(PolicyValidationError, EC2QueryParser.parse,
                           [{'Filters': [{'Name': 'instance-group-name', 'Values': [False]}]}])
+
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{'MaxResults': '1000'}])
 
 
 class TestTerminate(BaseTest):

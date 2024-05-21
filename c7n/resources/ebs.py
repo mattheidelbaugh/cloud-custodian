@@ -152,6 +152,7 @@ class SnapshotQueryParser(QueryParser):
         'OwnerIds': str,
         'RestorableByUserIds': str,
         'SnapshotIds': str,
+        'MaxResults': int,
     }
 
     type_name = 'EBS'

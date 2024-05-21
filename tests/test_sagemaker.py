@@ -1410,11 +1410,12 @@ class SagemakerJobQueryParse(BaseTest):
 
     def test_query(self):
         query = [
-                    {'StatusEquals': 'InProgress'},
-                    {'NameContains': 'c7n'},
-                    {'CreationTimeAfter': 1470968567.05},
-                    {'LastModifiedTimeBefore': '2022-09-15T17:15:20.000Z'}
-                ]
+            {'StatusEquals': 'InProgress'},
+            {'NameContains': 'c7n'},
+            {'CreationTimeAfter': 1470968567.05},
+            {'LastModifiedTimeBefore': '2022-09-15T17:15:20.000Z'},
+            {'MaxResults': 1000},
+        ]
         self.assertEqual(query, SagemakerJobQueryParser.parse(query))
 
     def test_invalid_query(self):
@@ -1442,6 +1443,10 @@ class SagemakerJobQueryParse(BaseTest):
         self.assertRaises(
             PolicyValidationError, SagemakerJobQueryParser.parse, [
                 {'CreationTimeAfter': 1}])
+
+        self.assertRaises(
+            PolicyValidationError, SagemakerJobQueryParser.parse, [
+                {'MaxResults': '10'}])
 
 
 class CompilationJobQueryParse(BaseTest):

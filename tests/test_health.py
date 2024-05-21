@@ -54,8 +54,12 @@ class TestHealthQueryParser(BaseTest):
     def test_query(self):
         self.assertEqual(HealthQueryParser.parse([]), [])
 
-        query = [{'availabilityZones': 'us-east-1a'}, {'services': 'EC2'}]
-        result_query = [{'availabilityZones': ['us-east-1a']}, {'services': ['EC2']}]
+        query = [{'availabilityZones': 'us-east-1a'}, {'services': 'EC2'}, {'maxResults': 10}]
+        result_query = [
+            {'availabilityZones': ['us-east-1a']},
+            {'services': ['EC2']},
+            {'maxResults': 10}
+        ]
         self.assertEqual(HealthQueryParser.parse(query), result_query)
 
         query = [{'eventStatusCodes': ['open', 'upcoming']}]

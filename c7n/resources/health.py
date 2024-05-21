@@ -85,7 +85,8 @@ class HealthQueryParser(QueryParser):
         'regions': str,
         'services': str,
         'eventStatusCodes': ('open', 'closed', 'upcoming'),
-        'eventTypeCodes': str
+        'eventTypeCodes': str,
+        'maxResults': int,
     }
 
     type_name = 'Health'
