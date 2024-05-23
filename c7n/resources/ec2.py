@@ -2075,6 +2075,7 @@ class PropagateSpotTags(BaseAction):
 
 class EC2QueryParser(QueryParser):
 
+    # Valid EC2 Query Filters
     # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2/client/describe_instances.html
     QuerySchema = {
         'Filters': {
