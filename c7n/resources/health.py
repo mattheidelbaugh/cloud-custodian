@@ -39,8 +39,6 @@ class HealthEvents(QueryResourceManager):
         for q in self.queries:
             key = list(q.keys())[0]
             values = list(q.values())[0]
-            if not isinstance(values, list):
-                values = [values]
             qf[key] = values
         return qf
 

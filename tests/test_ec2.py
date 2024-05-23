@@ -1644,6 +1644,10 @@ class TestEC2QueryParser(unittest.TestCase):
         self.assertRaises(PolicyValidationError, EC2QueryParser.parse, [{'MaxResults': '1000'}])
 
 
+        self.assertRaises(PolicyValidationError, EC2QueryParser.parse,
+                          [{'Filters': {'Name': 'instance-group-name', 'Values': ["Value1"]}}])
+
+
 class TestTerminate(BaseTest):
 
     def test_ec2_terminate(self):

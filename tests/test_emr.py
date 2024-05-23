@@ -191,6 +191,9 @@ class TestEMRQueryParser(unittest.TestCase):
 
         self.assertRaises(PolicyValidationError, EMRQueryParser.parse, [
             {"CreatedBefore": ['2022-02-23']}])
+        
+        self.assertRaises(PolicyValidationError, EMRQueryParser.parse, [
+            {"CreatedBefore": ['2022-02-23']}, ["not a dict"]])
 
 
 class TestTerminate(BaseTest):
