@@ -430,6 +430,7 @@ class PolicyQueryParser(QueryParser):
         'MaxItems': int,
     }
     multi_value = False
+    type_name = "IAM Policy"
 
 
 @resources.register('iam-profile')

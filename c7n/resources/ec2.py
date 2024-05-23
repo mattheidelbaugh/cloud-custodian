@@ -2105,6 +2105,7 @@ class EC2QueryParser(QueryParser):
         'InstanceIds': str,
         'MaxResults': int,
     }
+    single_value_fields = ('MaxResults',)
 
     type_name = "EC2"
 

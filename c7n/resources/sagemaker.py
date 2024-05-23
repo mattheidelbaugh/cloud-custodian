@@ -289,7 +289,7 @@ class SagemakerJobQueryParser(QueryParser):
         'MaxResults': int,
     }
     multi_value = False
-    type_name = 'Sagemaker'
+    type_name = 'Sagemaker Job'
 
 
 class CompilationJobQueryParser(SagemakerJobQueryParser):

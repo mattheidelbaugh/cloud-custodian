@@ -740,7 +740,7 @@ class QueryParser:
     QuerySchema = {}
     type_name = ''
     multi_value = True
-    single_value_types = ('date', int, bool)
+    single_value_fields = ()
 
     @classmethod
     def is_implicit_query_filter(cls, data):
@@ -749,7 +749,7 @@ class QueryParser:
 
         key = list(data[0].keys())[0]
         if (key not in cls.QuerySchema and 'Filters' in cls.QuerySchema and
-                (key in cls.QuerySchema.get('Filters', {}) or key.startswith('tag:'))):
+                (key in cls.QuerySchema['Filters'] or key.startswith('tag:'))):
             return True
         return False
 
@@ -772,15 +772,14 @@ class QueryParser:
                     cls.type_name,
                     data))
 
+        # Backwards compatibility
         if data:
-            # Backwards compatibility
-
             # Check for query filter key value pairs not listed under 'Filters' key
             if cls.is_implicit_query_filter(data):
                 data = cls.implicit_qfilter_translate(data)
 
             # Support iam-policy 'Name', 'Value' queries without 'Filters' key
-            if data[0].get('Value'):
+            if data[0].get('Value') and cls.type_name == 'IAM Policy':
                 try:
                     data = [{d['Name']: d['Value']} for d in data]
                 except KeyError:
@@ -788,13 +787,8 @@ class QueryParser:
                         "%s Query Invalid Format %s" % (cls.type_name, data))
 
             # Support ebs-snapshot 'Name', 'Values' queries without 'Filters' key
-            elif data[0].get('Values'):
-                try:
-                    qfilters = [{"Name": d['Name'], "Values": d['Values']} for d in data]
-                    data = [{"Filters": qfilters}]
-                except KeyError:
-                    raise PolicyValidationError(
-                        "%s Query Invalid Format %s" % (cls.type_name, data))
+            elif data[0].get('Values') and cls.type_name == 'EBS Snapshot':
+                data = [{"Filters": data}]
 
         results = []
         names = set()
@@ -810,11 +804,10 @@ class QueryParser:
                 key, value = cls.parse_query(d)
 
                 # Allow for multiple queries with the same key
-                if key in names and (not cls.multi_value or
-                                         cls.QuerySchema.get(key) in cls.single_value_types):
+                if key in names and (not cls.multi_value or key in cls.single_value_fields):
                     raise PolicyValidationError(
                         "%s Query Invalid Key: %s Must be unique" % (cls.type_name, key))
-                elif key in names and cls.multi_value:
+                elif key in names:
                     for q in results:
                         if list(q.keys())[0] == key:
                             q[key].append(d[key])
@@ -881,14 +874,12 @@ class QueryParser:
         key = list(data.keys())[0]
         values = list(data.values())[0]
 
-        vtype = cls.QuerySchema.get(key)
-
-        if not cls.multi_value and isinstance(values, list):
+        if (not cls.multi_value or key in cls.single_value_fields) and isinstance(values, list):
             raise PolicyValidationError(
                 "%s Query Invalid Key: Value:%s Must be single valued" % (
                     cls.type_name, key))
-        elif (cls.multi_value and not isinstance(values, list)
-              and vtype not in cls.single_value_types):
+        elif (cls.multi_value and key not in cls.single_value_fields
+              and not isinstance(values, list)):
             values = [values]
 
         if key not in cls.QuerySchema:
@@ -896,6 +887,7 @@ class QueryParser:
                 "%s Query Invalid Key:%s Valid: %s" % (
                     cls.type_name, key, ", ".join(cls.QuerySchema.keys())))
 
+        vtype = cls.QuerySchema.get(key)
         if isinstance(values, list):
             for v in values:
                 cls.type_check(vtype, v)

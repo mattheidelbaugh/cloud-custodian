@@ -181,14 +181,16 @@ class TestEMRQueryParser(unittest.TestCase):
 
         self.assertRaises(PolicyValidationError, EMRQueryParser.parse, [{"tag:ASV": None}])
 
-        self.assertRaises(
-            PolicyValidationError, EMRQueryParser.parse, [{"too": "many", "keys": "error"}]
-        )
+        self.assertRaises(PolicyValidationError, EMRQueryParser.parse, [
+            {"too": "many", "keys": "error"}])
 
         self.assertRaises(PolicyValidationError, EMRQueryParser.parse, ["Not a dictionary"])
 
-        self.assertRaises(PolicyValidationError, EMRQueryParser.parse,
-                          [{"CreatedBefore": '2022-02-23'}, {"CreatedBefore": '2022-02-24'}])
+        self.assertRaises(PolicyValidationError, EMRQueryParser.parse, [
+            {"CreatedBefore": '2022-02-23'}, {"CreatedBefore": '2022-02-24'}])
+
+        self.assertRaises(PolicyValidationError, EMRQueryParser.parse, [
+            {"CreatedBefore": ['2022-02-23']}])
 
 
 class TestTerminate(BaseTest):

@@ -154,8 +154,9 @@ class SnapshotQueryParser(QueryParser):
         'SnapshotIds': str,
         'MaxResults': int,
     }
+    single_value_fields = ('MaxResults',)
 
-    type_name = 'EBS'
+    type_name = 'EBS Snapshot'
 
 
 @Snapshot.action_registry.register('tag')

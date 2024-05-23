@@ -210,6 +210,7 @@ class EMRQueryParser(QueryParser):
         'CreatedBefore': 'date',
         'CreatedAfter': 'date',
     }
+    single_value_fields = ('CreatedBefore', 'CreatedAfter')
 
     type_name = "EMR"
 

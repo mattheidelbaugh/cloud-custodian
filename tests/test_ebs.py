@@ -97,6 +97,8 @@ class SnapshotQueryParse(BaseTest):
 
         self.assertRaises(PolicyValidationError, QueryParser.parse, [{'Owner': 'self'}])
 
+        self.assertRaises(PolicyValidationError, QueryParser.parse, [{'MaxResults': [1000]}])
+
         self.assertRaises(PolicyValidationError, QueryParser.parse, [
             {'MaxResults': 1000}, {'MaxResults': 5000}])
 

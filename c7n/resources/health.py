@@ -88,5 +88,6 @@ class HealthQueryParser(QueryParser):
         'eventTypeCodes': str,
         'maxResults': int,
     }
+    single_value_fields = ('maxResults')
 
-    type_name = 'Health'
+    type_name = 'Health Event'
