@@ -641,13 +641,16 @@ class ContentFilter(ValueFilter):
     schema_alias = False
     permissions = ('ssm:GetDocument',)
     policy_annotation = 'c7n:MatchedContent'
+    content_annotation = "c7n:Content"
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('ssm')
         results = []
         for r in resources:
-            doc = client.get_document(Name=r['Name'])
-            doc['Content'] = json.loads(doc['Content'])
+            if self.content_annotation not in r:
+                doc = self.manager.retry(client.get_document, Name=r['Name'])
+                doc['Content'] = json.loads(doc['Content'])
+                r[self.content_annotation] = doc
             if self.match(doc['Content']):
                 r[self.policy_annotation] = self.data.get('value')
                 results.append(r)
