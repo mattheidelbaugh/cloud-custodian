@@ -650,6 +650,7 @@ class ContentFilter(ValueFilter):
             if self.content_annotation not in r:
                 doc = self.manager.retry(client.get_document, Name=r['Name'])
                 doc['Content'] = json.loads(doc['Content'])
+                doc.pop('ResponseMetadata', None)
                 r[self.content_annotation] = doc
             if self.match(doc['Content']):
                 r[self.policy_annotation] = self.data.get('value')
