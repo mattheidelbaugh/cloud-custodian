@@ -269,7 +269,7 @@ class StopOpensearchInjestion(BaseAction):
           - name: stop-osis-pipeline
             resource: opensearch-injestion
             filters:
-              -PipelineName: c7n-pipeline-1
+              - PipelineName: c7n-pipeline-1
             actions:
               - stop
     """
