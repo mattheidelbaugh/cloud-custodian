@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:storagegateway:us-east-1:644160558196:gateway/sgw-EBA41682",
+                "Tags": [
+                    {
+                        "Key": "TestTag",
+                        "Value": "c7n"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
