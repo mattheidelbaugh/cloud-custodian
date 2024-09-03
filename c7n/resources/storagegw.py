@@ -32,7 +32,7 @@ class GatewayInfoFilter(ValueFilter):
 
             policies:
               - name: gw-info
-                resource: storagegateway
+                resource: storage-gateway
                 filters:
                   - type: info
                     key: GatewayTimezone
