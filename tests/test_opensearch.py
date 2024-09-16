@@ -163,7 +163,7 @@ class OpensearchIngestion(BaseTest):
             'arn:aws:kms:us-east-1:644160558196:key/082cd05f-96d1-49f6-a5ac-32093d2cfe38')
 
     def test_opensearch_ingestion_update(self):
-        session_factory = self.replay_flight_data('test_opensearch_injestion_update')
+        session_factory = self.replay_flight_data('test_opensearch_ingestion_update')
         policy = {
                 'name': 'test-opensearch-ingestion-update',
                 'resource': 'opensearch-ingestion',
