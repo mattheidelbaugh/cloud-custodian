@@ -182,7 +182,7 @@ class TagOpensearchIngestion(Tag):
 
 
 @OpensearchIngestion.action_registry.register('remove-tag')
-class RemoveTagg(RemoveTag):
+class RemoveTagOpensearchIngestion(RemoveTag):
     """Remove tags from an OpenSearch Ingestion Pipeline
 
     :example:
