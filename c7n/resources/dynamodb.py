@@ -6,6 +6,7 @@ from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n import query
 from c7n.manager import resources
 from c7n.tags import (
@@ -118,6 +119,24 @@ class TableContinuousBackupFilter(ValueFilter):
 
     def __call__(self, r):
         return super().__call__(r.get(self.annotation_key, {}))
+    
+
+@Table.filter_registry.register('cross-account')
+class CrossAccountTable(CrossAccountAccessFilter):
+
+    policy_attribute = 'c7n:Policy'
+    permissions = ('dynamodb:GetResourcePolicy',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('dynamodb')
+        for r in resources:
+            result = self.manager.retry(
+                client.get_resource_policy,
+                ResourceArn=r['TableArn'],
+                ignore_err_codes=('ResourceNotFoundException','PolicyNotFoundException'))
+            if result is not None:
+                r[self.policy_attribute] = result['Policy']
+        return super().process(resources)
 
 
 @Table.action_registry.register('set-continuous-backup')
