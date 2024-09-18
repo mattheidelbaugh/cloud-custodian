@@ -119,7 +119,7 @@ class TableContinuousBackupFilter(ValueFilter):
 
     def __call__(self, r):
         return super().__call__(r.get(self.annotation_key, {}))
-    
+
 
 @Table.filter_registry.register('cross-account')
 class CrossAccountTable(CrossAccountAccessFilter):
@@ -133,7 +133,7 @@ class CrossAccountTable(CrossAccountAccessFilter):
             result = self.manager.retry(
                 client.get_resource_policy,
                 ResourceArn=r['TableArn'],
-                ignore_err_codes=('ResourceNotFoundException','PolicyNotFoundException'))
+                ignore_err_codes=('ResourceNotFoundException', 'PolicyNotFoundException'))
             if result is not None:
                 r[self.policy_attribute] = result['Policy']
         return super().process(resources)

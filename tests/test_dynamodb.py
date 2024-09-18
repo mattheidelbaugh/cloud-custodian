@@ -154,7 +154,7 @@ class DynamodbTest(BaseTest):
         self.assertEqual(
             resources[0]["c7n:continuous-backup"]["PointInTimeRecoveryDescription"]["PointInTimeRecoveryStatus"], # noqa
             "DISABLED")
-        
+
     def test_dynamodb_cross_account_filter(self):
         session_factory = self.replay_flight_data("test_dynamodb_cross_account_filter")
         p = self.load_policy(
