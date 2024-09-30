@@ -61,20 +61,23 @@ def test_load_array_expression(test):
         }
     )
     assert p.run() == [
-        'CloseAccount',
-        'DeleteAlternateContact',
-        'DisableRegion',
-        'EnableRegion',
-        'GetAccountInformation',
-        'GetAlternateContact',
-        'GetChallengeQuestions',
-        'GetContactInformation',
-        'GetRegionOptStatus',
-        'ListRegions',
-        'PutAlternateContact',
-        'PutChallengeQuestions',
-        'PutContactInformation',
-    ]
+        "AcceptPrimaryEmailUpdate",
+        "CloseAccount",
+        "DeleteAlternateContact",
+        "DisableRegion",
+        "EnableRegion",
+        "GetAccountInformation",
+        "GetAlternateContact",
+        "GetChallengeQuestions",
+        "GetContactInformation",
+        "GetPrimaryEmail",
+        "GetRegionOptStatus",
+        "ListRegions",
+        "PutAlternateContact",
+        "PutChallengeQuestions",
+        "PutContactInformation",
+        "StartPrimaryEmailUpdate"
+  ]
 
 
 def test_disk_bad_path(tmpdir, test):
