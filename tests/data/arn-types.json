@@ -2148,11 +2148,20 @@
   "ses": {
     "addon-instance": "arn:${Partition}:ses:${Region}:${Account}:addon-instance/${AddonInstanceId}",
     "addon-subscription": "arn:${Partition}:ses:${Region}:${Account}:addon-subscription/${AddonSubscriptionId}",
+    "configuration-set": "arn:${Partition}:ses:${Region}:${Account}:configuration-set/${ConfigurationSetName}",
+    "contact-list": "arn:${Partition}:ses:${Region}:${Account}:contact-list/${ContactListName}",
+    "custom-verification-email-template": "arn:${Partition}:ses:${Region}:${Account}:custom-verification-email-template/${TemplateName}",
+    "dedicated-ip-pool": "arn:${Partition}:ses:${Region}:${Account}:dedicated-ip-pool/${DedicatedIPPool}",
+    "deliverability-test-report": "arn:${Partition}:ses:${Region}:${Account}:deliverability-test-report/${ReportId}",
+    "export-job": "arn:${Partition}:ses:${Region}:${Account}:export-job/${ExportJobId}",
+    "identity": "arn:${Partition}:ses:${Region}:${Account}:identity/${IdentityName}",
+    "import-job": "arn:${Partition}:ses:${Region}:${Account}:import-job/${ImportJobId}",
     "mailmanager-archive": "arn:${Partition}:ses:${Region}:${Account}:mailmanager-archive/${ArchiveId}",
     "mailmanager-ingress-point": "arn:${Partition}:ses:${Region}:${Account}:mailmanager-ingress-point/${IngressPointId}",
     "mailmanager-rule-set": "arn:${Partition}:ses:${Region}:${Account}:mailmanager-rule-set/${RuleSetId}",
     "mailmanager-smtp-relay": "arn:${Partition}:ses:${Region}:${Account}:mailmanager-smtp-relay/${RelayId}",
-    "mailmanager-traffic-policy": "arn:${Partition}:ses:${Region}:${Account}:mailmanager-traffic-policy/${TrafficPolicyId}"
+    "mailmanager-traffic-policy": "arn:${Partition}:ses:${Region}:${Account}:mailmanager-traffic-policy/${TrafficPolicyId}",
+    "template": "arn:${Partition}:ses:${Region}:${Account}:template/${TemplateName}"
   },
   "shield": {
     "attack": "arn:${Partition}:shield::${Account}:attack/${Id}",
