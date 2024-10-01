@@ -7,6 +7,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import uuid
 from unittest.mock import ANY, patch
 
 from urllib.request import urlopen
@@ -244,6 +245,19 @@ def test_graph_resolver_id():
     resolver = Resolver()
     assert resolver.is_id_ref("4b3db3ec-98ad-4382-a460-d8e392d128b7") is True
     assert resolver.is_id_ref("a" * 36) is False
+
+
+def test_resolver_refs_sans_tfmeta():
+    resolver = Resolver()
+    buid = str(uuid.uuid4())
+    cuid = str(uuid.uuid4())
+    block = dict(id=str(uuid.uuid4()), bref=buid, cref=cuid, __tfmeta={"label": "xyz"})
+    resolver.visit(block)
+    resolver.visit(dict(id=cuid, __tfmeta={"label": "tree"}))
+    resolver.visit(dict(id=buid, something=1))
+    refs = list(resolver.resolve_refs(block, ("tree",)))
+    assert len(refs) == 1
+    assert refs[0]["id"] == cuid
 
 
 def test_event_env(policy_env, test):
@@ -764,10 +778,6 @@ def test_traverse_multi_resource_inside_or(tmp_path):
     }
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Known issue with branching inside attrs: https://github.com/cloud-custodian/cloud-custodian/issues/9690",
-)
 def test_traverse_multi_resource_nested_or(tmp_path):
     resources = run_policy(
         {

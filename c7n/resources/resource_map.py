@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 ResourceMap = {
   "aws.access-analyzer-finding": "c7n.resources.accessanalyzer.AccessanalyzerFinding",
+  "aws.sfn-activity": "c7n.resources.sfn.Activity",
   "aws.account": "c7n.resources.account.Account",
   "aws.acm-certificate": "c7n.resources.acm.Certificate",
   "aws.advisor-check": "c7n.resources.support.AdvisorCheck",
@@ -116,6 +117,7 @@ ResourceMap = {
   "aws.gamelift-build": "c7n.resources.gamelift.GameLiftBuild",
   "aws.gamelift-fleet": "c7n.resources.gamelift.GameLiftFleet",
   "aws.glacier": "c7n.resources.glacier.Glacier",
+  "aws.globalaccelerator": "c7n.resources.globalaccelerator.GlobalAccelerator",
   "aws.glue-catalog": "c7n.resources.glue.GlueDataCatalog",
   "aws.glue-classifier": "c7n.resources.glue.GlueClassifier",
   "aws.glue-connection": "c7n.resources.glue.GlueConnection",
@@ -169,6 +171,8 @@ ResourceMap = {
   "aws.log-metric": "c7n.resources.cw.LogMetric",
   "aws.memorydb": "c7n.resources.memorydb.MemoryDb",
   "aws.memorydb-snapshot": "c7n.resources.memorydb.MemoryDbSnapshot",
+  "aws.memorydb-user": "c7n.resources.memorydb.MemoryDbUser",
+  "aws.memorydb-acl": "c7n.resources.memorydb.MemoryDbAcl",
   "aws.memorydb-subnet-group": "c7n.resources.memorydb.MemoryDbSubnetGroup",
   "aws.message-broker": "c7n.resources.mq.MessageBroker",
   "aws.message-config": "c7n.resources.mq.MessageConfig",
@@ -184,7 +188,7 @@ ResourceMap = {
   "aws.networkmanager-global": "c7n.resources.networkmanager.GlobalNetwork",
   "aws.networkmanager-link": "c7n.resources.networkmanager.Link",
   "aws.networkmanager-site": "c7n.resources.networkmanager.Site",
-  "aws.opensearch-injestion": "c7n.resources.opensearch.OpensearchInjestion",
+  "aws.opensearch-ingestion": "c7n.resources.opensearch.OpensearchIngestion",
   "aws.opensearch-serverless": "c7n.resources.opensearch.OpensearchServerless",
   "aws.ops-item": "c7n.resources.ssm.OpsItem",
   "aws.opswork-cm": "c7n.resources.opsworks.OpsworksCM",
