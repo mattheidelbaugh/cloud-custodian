@@ -1,0 +1,47 @@
+[
+  {
+    "IdentityType": "DOMAIN",
+    "IdentityName": "c7ntest.com",
+    "SendingEnabled": false,
+    "VerificationStatus": "PENDING",
+    "FeedbackForwardingStatus": true,
+    "VerifiedForSendingStatus": false,
+    "DkimAttributes": {
+      "SigningEnabled": true,
+      "Status": "PENDING",
+      "Tokens": [
+        "t77srlygz75k4ccggfmgiha5pu5dpckb",
+        "4xl6eft4g7yqbctnqoywi4ckswxe36lz",
+        "flnv4kuahcizhhhjvzvxhozjyarikxo4"
+      ],
+      "SigningAttributesOrigin": "AWS_SES",
+      "NextSigningKeyLength": "RSA_2048_BIT",
+      "CurrentSigningKeyLength": "RSA_2048_BIT",
+      "LastKeyGenerationTimestamp": "2024-10-04T15:34:33.464000-04:00"
+    },
+    "MailFromAttributes": {
+      "BehaviorOnMxFailure": "USE_DEFAULT_VALUE"
+    },
+    "Policies": {
+      "Policy-1728070425896": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"stmt1728070551839\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":\"ses:*\",\"Resource\":\"arn:aws:ses:us-west-2:644160558196:identity/c7ntest.com\",\"Condition\":{}}]}",
+      "Policy-1728070619290": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"stmt1728070670549\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::851925785310:root\"},\"Action\":\"ses:SendEmail\",\"Resource\":\"arn:aws:ses:us-west-2:644160558196:identity/c7ntest.com\",\"Condition\":{}}]}"
+    },
+    "Tags": [],
+    "VerificationInfo": {
+      "LastCheckedTimestamp": "2024-10-04T16:03:35.957000-04:00",
+      "ErrorType": "HOST_NOT_FOUND"
+    },
+    "CrossAccountViolations": [
+      {
+        "Sid": "stmt1728070670549",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS": "arn:aws:iam::851925785310:root"
+        },
+        "Action": "ses:SendEmail",
+        "Resource": "arn:aws:ses:us-west-2:644160558196:identity/c7ntest.com",
+        "Condition": {}
+      }
+    ]
+  }
+]

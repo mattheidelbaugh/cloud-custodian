@@ -1,0 +1,82 @@
+{
+  "policy": {
+    "name": "test-ses-x-account",
+    "resource": "ses-email-identity",
+    "filters": [
+      "cross-account"
+    ]
+  },
+  "version": "0.9.41",
+  "execution": {
+    "id": "462447fc-63e6-4f23-a75d-5eaf267806e4",
+    "start": 1728072911.370813,
+    "end_time": 1728072912.3127515,
+    "duration": 0.9419386386871338
+  },
+  "config": {
+    "region": "us-west-2",
+    "regions": [
+      "us-west-2"
+    ],
+    "cache": "~/.cache/cloud-custodian.cache",
+    "profile": null,
+    "account_id": "644160558196",
+    "assume_role": null,
+    "session_policy": null,
+    "external_id": null,
+    "log_group": null,
+    "tracer": null,
+    "metrics_enabled": null,
+    "metrics": null,
+    "output_dir": "test",
+    "cache_period": 0,
+    "dryrun": true,
+    "authorization_file": null,
+    "subparser": "run",
+    "config": null,
+    "configs": [
+      "c7n/resources/policies.yml"
+    ],
+    "policy_filters": [],
+    "resource_types": [],
+    "verbose": null,
+    "quiet": null,
+    "debug": false,
+    "skip_validation": false,
+    "command": "c7n.commands.run",
+    "vars": null
+  },
+  "sys-stats": {
+    "snapshot_time": 0.9419522285461426,
+    "num_fds": 1,
+    "cpu_user": 0.14000000000000007,
+    "num_ctx_switches_voluntary": 20,
+    "num_ctx_switches_involuntary": 2,
+    "read_count": 246,
+    "write_count": 10,
+    "write_bytes": 8192,
+    "read_bytes": 163840,
+    "rss": 7925760,
+    "vms": 82518016,
+    "shared": 98304,
+    "data": 16429056
+  },
+  "api-stats": {
+    "email.ListEmailIdentities": 1,
+    "email.GetEmailIdentity": 2
+  },
+  "metrics": [
+    {
+      "MetricName": "ResourceCount",
+      "Timestamp": "2024-10-04T16:15:12.312245",
+      "Value": 1,
+      "Unit": "Count"
+    },
+    {
+      "MetricName": "ResourceTime",
+      "Timestamp": "2024-10-04T16:15:12.312253",
+      "Value": 0.9357919692993164,
+      "Unit": "Seconds"
+    }
+  ]
+}
