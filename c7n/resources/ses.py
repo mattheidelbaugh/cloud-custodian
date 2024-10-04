@@ -105,6 +105,8 @@ class SESEmailIdentity(QueryResourceManager):
 @SESEmailIdentity.filter_registry.register('cross-account')
 class CrossAccountEmailIdentity(CrossAccountAccessFilter):
 
+    # dummy permission
+    permissions = ('ses:ListEmailIdentities',)
     policy_attribute = 'c7n:AggregatedPolicy'
 
     def process(self, resources, event=None):
