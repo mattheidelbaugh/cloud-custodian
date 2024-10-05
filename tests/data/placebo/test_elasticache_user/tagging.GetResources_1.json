@@ -4,7 +4,7 @@
         "PaginationToken": "",
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:elasticache:us-east-1:644160558196:user:c7n-user",
+                "ResourceARN": "arn:aws:elasticache:us-east-1:123456789012:user:c7n-user",
                 "Tags": []
             }
         ],
