@@ -167,7 +167,35 @@ class DynamodbTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue("c7n:Policy" in resources[0])
+        self.assertTrue("Policy" in resources[0])
+
+    def test_dynamodb_has_statement_filter(self):
+        session_factory = self.replay_flight_data("test_dynamodb_has_statement_filter")
+        p = self.load_policy(
+            {
+                "name": "dynamodb-has-statement",
+                "resource": "dynamodb-table",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Deny",
+                                "Action": "dynamodb:*",
+                                "Principal": "*",
+                                "Condition":
+                                    {"Bool": {"aws:SecureTransport": "false"}},
+                                "Resource": "{table_arn}"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue("Policy" in resources[0])
 
     def test_continuous_backup_action(self):
         session_factory = self.replay_flight_data("test_dynamodb_continuous_backup_action")

@@ -19,6 +19,7 @@ from c7n.filters import Filter
 from c7n.filters import ValueFilter
 from c7n.query import RetryPageIterator
 from c7n.filters.backup import ConsecutiveAwsBackupsFilter
+from c7n.filters.policystatement import HasStatementFilter
 
 
 class ConfigTable(query.ConfigSource):
@@ -124,8 +125,32 @@ class TableContinuousBackupFilter(ValueFilter):
 @Table.filter_registry.register('cross-account')
 class CrossAccountTable(CrossAccountAccessFilter):
 
-    policy_attribute = 'c7n:Policy'
     permissions = ('dynamodb:GetResourcePolicy',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('dynamodb')
+        for r in resources:
+            result = self.manager.retry(
+                client.get_resource_policy,
+                ResourceArn=r['TableArn'],
+                ignore_err_codes=('ResourceNotFoundException', 'PolicyNotFoundException'))
+            if result is not None:
+                r[self.policy_attribute] = result['Policy']
+        return super().process(resources)
+
+
+@Table.filter_registry.register('has-statement')
+class HasStatementTable(HasStatementFilter):
+
+    permissions = ('dynamodb:GetResourcePolicy',)
+    policy_attribute = 'Policy'
+
+    def get_std_format_args(self, table):
+        return {
+            'table_arn': table[self.manager.resource_type.arn],
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region,
+        }
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('dynamodb')
