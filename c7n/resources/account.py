@@ -2562,13 +2562,14 @@ class SetEC2MetadataDefaults(BaseAction):
                       key: HttpTokens
                       value: absent
                 actions:
-                  - set-ec2-metadata-defaults
+                  - type: set-ec2-metadata-defaults
                     HttpTokens: required
 
     """
 
     schema = {
         'type': 'object',
+        'additionalProperties': False,
         'properties': {
             'type': {'enum': ['set-ec2-metadata-defaults']},
             'HttpTokens': {'enum': ['optional', 'required', 'no-preference']},
@@ -2577,6 +2578,8 @@ class SetEC2MetadataDefaults(BaseAction):
             'InstanceMetadataTags': {'enum': ['enabled', 'disabled', 'no-preference']},
         },
     }
+
+    permissions = ('ec2:ModifyInstanceMetadataDefaults',)
     service = 'ec2'
     shape = 'ModifyInstanceMetadataDefaultsRequest'
 
