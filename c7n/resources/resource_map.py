@@ -64,6 +64,7 @@ ResourceMap = {
   "aws.datasync-agent": "c7n.resources.datasync.DataSyncAgent",
   "aws.datasync-task": "c7n.resources.datasync.DataSyncTask",
   "aws.dax": "c7n.resources.dynamodb.DynamoDbAccelerator",
+  "aws.delivery-destination": "c7n.resources.cw.DeliveryDestination",
   "aws.devicefarm-project": "c7n.resources.devicefarm.DevicefarmProject",
   "aws.directconnect": "c7n.resources.directconnect.DirectConnect",
   "aws.directory": "c7n.resources.directory.Directory",
