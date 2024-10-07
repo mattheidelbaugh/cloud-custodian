@@ -2567,17 +2567,13 @@ class SetEC2MetadataDefaults(BaseAction):
 
     """
 
-    schema = {
-        'type': 'object',
-        'additionalProperties': False,
-        'properties': {
-            'type': {'enum': ['set-ec2-metadata-defaults']},
-            'HttpTokens': {'enum': ['optional', 'required', 'no-preference']},
-            'HttpPutResponseHopLimit': 'integer',
-            'HttpEndpoint': {'enum': ['enabled', 'disabled', 'no-preference']},
-            'InstanceMetadataTags': {'enum': ['enabled', 'disabled', 'no-preference']},
-        },
-    }
+    schema = type_schema(
+        'set-ec2-metadata-defaults',
+        HttpTokens={'enum': ['optional', 'required', 'no-preference']},
+        HttpPutResponseHopLimit={'type': 'integer'},
+        HttpEndpoint={'enum': ['enabled', 'disabled', 'no-preference']},
+        InstanceMetadataTags={'enum': ['enabled', 'disabled', 'no-preference']},
+    )
 
     permissions = ('ec2:ModifyInstanceMetadataDefaults',)
     service = 'ec2'
