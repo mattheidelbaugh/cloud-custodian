@@ -1112,17 +1112,20 @@ class DestinationCrossAccount(CrossAccountAccessFilter):
 @DeliveryDestination.action_registry.register('delete')
 class DestinationDelete(BaseAction):
     """Action to delete a delivery destination
+
     :example:
+
     .. code-block:: yaml
-            policies:
-              - name: delete-destination
-                resource: aws.delivery-destination
-                filters:
-                  - type: value
-                    key: deliveryDestinationType
-                    value: S3
-                actions:
-                  - delete
+
+        policies:
+          - name: delete-destination
+            resource: aws.delivery-destination
+            filters:
+              - type: value
+                key: deliveryDestinationType
+                value: S3
+            actions:
+              - delete
     """
     schema = type_schema('delete')
 
