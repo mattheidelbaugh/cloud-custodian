@@ -22,6 +22,7 @@ from c7n.utils import local_session, type_schema, generate_arn, get_support_regi
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.filters import ListItemFilter
 
+from c7n.resources.aws import fake_session
 from c7n.resources.iam import CredentialReport
 from c7n.resources.securityhub import OtherResourcePostFinding
 
@@ -2541,8 +2542,23 @@ class EC2MetadataDefaults(ValueFilter):
         return super(EC2MetadataDefaults, self).__call__(r[self.annotation_key])
 
 
+class ExpandedSchemaMeta(type):
+    def __init__(cls, name, bases, dct):
+        session = fake_session()._session
+        model = session.get_service_model(cls.service)
+        shape = model.shape_for(cls.shape)
+        schema = cls.schema
+
+        for member, member_shape in shape.members.items():
+            member_schema = {'type': member_shape.type_name}
+            if enum := getattr(member_shape, 'enum', None):
+                member_schema['enum'] = enum
+            schema['properties'][member] = member_schema
+        cls.schema = schema
+
+
 @actions.register('set-ec2-metadata-defaults')
-class SetEC2MetadataDefaults(BaseAction):
+class SetEC2MetadataDefaults(BaseAction, metaclass=ExpandedSchemaMeta):
     """Modifies the default instance metadata service (IMDS) settings at the account level.
 
     :example:
@@ -2567,14 +2583,7 @@ class SetEC2MetadataDefaults(BaseAction):
 
     """
 
-    schema = type_schema(
-        'set-ec2-metadata-defaults',
-        HttpTokens={'enum': ['optional', 'required', 'no-preference']},
-        HttpPutResponseHopLimit={'type': 'integer'},
-        HttpEndpoint={'enum': ['enabled', 'disabled', 'no-preference']},
-        InstanceMetadataTags={'enum': ['enabled', 'disabled', 'no-preference']},
-    )
-
+    schema = type_schema('set-ec2-metadata-defaults')
     permissions = ('ec2:ModifyInstanceMetadataDefaults',)
     service = 'ec2'
     shape = 'ModifyInstanceMetadataDefaultsRequest'
