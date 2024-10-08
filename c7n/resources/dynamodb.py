@@ -126,6 +126,7 @@ class TableContinuousBackupFilter(ValueFilter):
 class CrossAccountTable(CrossAccountAccessFilter):
 
     permissions = ('dynamodb:GetResourcePolicy',)
+    policy_attribute = 'c7n:Policy'
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('dynamodb')
@@ -145,7 +146,7 @@ class CrossAccountTable(CrossAccountAccessFilter):
 class HasStatementTable(HasStatementFilter):
 
     permissions = ('dynamodb:GetResourcePolicy',)
-    policy_attribute = 'Policy'
+    policy_attribute = 'c7n:Policy'
 
     def get_std_format_args(self, table):
         return {
