@@ -493,14 +493,14 @@ class LogGroupTest(BaseTest):
         self.assertIn('c7n:MetricAlarms', resources[0])
 
 
-class DeliveryDestinationTest(BaseTest):
-    def test_delivery_destination(self):
-        factory = self.replay_flight_data('test_delivery_destination')
+class LogDestinationTest(BaseTest):
+    def test_log_destination(self):
+        factory = self.replay_flight_data('test_log_destination')
         client = local_session(factory).client('logs')
         p = self.load_policy(
             {
-                'name': 'delivery-destination-tag',
-                'resource': 'delivery-destination',
+                'name': 'log-destination-tag',
+                'resource': 'log-destination',
                 'filters': [{
                     'type': 'value',
                     'key': 'name',
@@ -521,8 +521,8 @@ class DeliveryDestinationTest(BaseTest):
 
         p = self.load_policy(
             {
-                'name': 'delivery-destination-untag',
-                'resource': 'delivery-destination',
+                'name': 'log-destination-untag',
+                'resource': 'log-destination',
                 'filters': [{
                     'type': 'value',
                     'key': 'name',
@@ -539,12 +539,12 @@ class DeliveryDestinationTest(BaseTest):
         tags = client.list_tags_for_resource(resourceArn=resources[0]['arn'])['tags']
         assert 'test-tag' not in tags
 
-    def test_delivery_destination_cross_account(self):
-        factory = self.replay_flight_data('test_delivery_destination_cross_account')
+    def test_log_destination_cross_account(self):
+        factory = self.replay_flight_data('test_log_destination_cross_account')
         p = self.load_policy(
             {
-                'name': 'cross-account-delivery-destination',
-                'resource': 'delivery-destination',
+                'name': 'cross-account-log-destination',
+                'resource': 'log-destination',
                 'filters': [{
                     'type': 'cross-account'
                 }],
@@ -553,13 +553,13 @@ class DeliveryDestinationTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    def test_delivery_destination_delete(self):
-        factory = self.replay_flight_data('test_delivery_destination_delete')
+    def test_log_destination_delete(self):
+        factory = self.replay_flight_data('test_log_destination_delete')
         client = local_session(factory).client('logs')
         p = self.load_policy(
             {
-                'name': 'delivery-destination-delete',
-                'resource': 'delivery-destination',
+                'name': 'log-destination-delete',
+                'resource': 'log-destination',
                 'filters': [{
                     'type': 'value',
                     'key': 'name',

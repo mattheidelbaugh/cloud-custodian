@@ -1073,8 +1073,8 @@ class CloudWatchDashboard(QueryResourceManager):
     }
 
 
-@resources.register("delivery-destination")
-class DeliveryDestination(QueryResourceManager):
+@resources.register("log-destination")
+class LogDestination(QueryResourceManager):
     class resource_type(TypeInfo):
         service = "logs"
         enum_spec = ('describe_delivery_destinations', 'deliveryDestinations', None)
@@ -1090,7 +1090,7 @@ class DeliveryDestination(QueryResourceManager):
     }
 
 
-@DeliveryDestination.filter_registry.register('cross-account')
+@LogDestination.filter_registry.register('cross-account')
 class DestinationCrossAccount(CrossAccountAccessFilter):
 
     policy_attribute = 'c7n:Policy'
@@ -1109,7 +1109,7 @@ class DestinationCrossAccount(CrossAccountAccessFilter):
         return super().process(resources)
 
 
-@DeliveryDestination.action_registry.register('delete')
+@LogDestination.action_registry.register('delete')
 class DestinationDelete(BaseAction):
     """Action to delete a delivery destination
 
@@ -1119,7 +1119,7 @@ class DestinationDelete(BaseAction):
 
         policies:
           - name: delete-destination
-            resource: aws.delivery-destination
+            resource: aws.log-destination
             filters:
               - type: value
                 key: deliveryDestinationType
