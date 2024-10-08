@@ -2544,9 +2544,20 @@ class EC2MetadataDefaults(ValueFilter):
 
 class ExpandedSchemaMeta(type):
     def __init__(cls, name, bases, dct):
+        """Expand an element's schema using service model shape data
+
+        Repurpose some of the shape discovery/validation logic in
+        c7n.resources.aws.shape_validate() to dynamically expand
+        element schema using the latest service model shape information.
+
+        Include available properties, their types, and enumerations of
+        possible values where available. Rely on shape_validate() at
+        runtime for more thorough validation.
+        """
         session = fake_session()._session
         model = session.get_service_model(cls.service)
         shape = model.shape_for(cls.shape)
+
         schema = cls.schema
 
         for member, member_shape in shape.members.items():
