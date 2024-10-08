@@ -130,6 +130,8 @@ class CrossAccountTable(CrossAccountAccessFilter):
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('dynamodb')
         for r in resources:
+            if self.policy_attribute in r:
+                continue
             result = self.manager.retry(
                 client.get_resource_policy,
                 ResourceArn=r['TableArn'],
@@ -155,6 +157,8 @@ class HasStatementTable(HasStatementFilter):
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('dynamodb')
         for r in resources:
+            if self.policy_attribute in r:
+                continue
             result = self.manager.retry(
                 client.get_resource_policy,
                 ResourceArn=r['TableArn'],
