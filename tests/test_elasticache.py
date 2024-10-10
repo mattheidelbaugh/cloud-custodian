@@ -594,7 +594,7 @@ class TestElastiCacheUser(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['UserId'], 'c7n-user')
         tags = client.list_tags_for_resource(
-            ResourceName='arn:aws:elasticache:us-east-1:644160558196:user:c7n-user')["TagList"]
+            ResourceName='arn:aws:elasticache:us-east-1:123456789012:user:c7n-user')["TagList"]
         assert len(tags) == 0
 
     def test_elasticache_user_modify(self):
