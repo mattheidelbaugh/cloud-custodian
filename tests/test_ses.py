@@ -188,7 +188,8 @@ class SESV2Test(BaseTest):
                 "name": "ses-cross-acct",
                 "resource": "ses-email-identity",
                 "filters": ["cross-account"],
-            }, session_factory=session_factory,
+            },
+            session_factory=session_factory,
         )
         resources = p.run()
         self.assertEqual(1, len(resources))
