@@ -581,7 +581,8 @@ def resource_vocabulary(cloud_name=None, qualify_name=True, aliases=True):
 
 class ExpandedSchemaMeta(type):
 
-    resource_id_key = ''    # resource id key passed to api call to be dropped from schema
+    # resource id key passed to api call to be dropped from schema
+    resource_id_key = ''
     type_map = {
         'string': 'string',
         'structure': 'object',

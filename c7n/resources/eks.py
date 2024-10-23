@@ -172,26 +172,13 @@ class EKSRemoveTag(tags.RemoveTag):
 @EKS.action_registry.register('update-config')
 class UpdateConfig(Action, metaclass=ExpandedSchemaMeta):
 
-    # schema = {
-    #     'type': 'object',
-    #     'additionalProperties': False,
-    #     'oneOf': [
-    #         {'required': ['type', 'logging']},
-    #         {'required': ['type', 'resourcesVpcConfig']},
-    #         {'required': ['type', 'logging', 'resourcesVpcConfig']}],
-    #     'properties': {
-    #         'type': {'enum': ['update-config']},
-    #         'logging': {'type': 'object'},
-    #         'resourcesVpcConfig': {'type': 'object'}
-    #     }
-    # }
-    resource_id_key = 'name'
     schema = type_schema('update-config', **{'oneOf': [
             {'required': ['type', 'logging']},
             {'required': ['type', 'resourcesVpcConfig']},
             {'required': ['type', 'logging', 'resourcesVpcConfig']}]})
 
     permissions = ('eks:UpdateClusterConfig',)
+    resource_id_key = 'name'
     shape = 'UpdateClusterConfigRequest'
     service = 'eks'
 
@@ -199,6 +186,7 @@ class UpdateConfig(Action, metaclass=ExpandedSchemaMeta):
         cfg = dict(self.data)
         cfg['name'] = 'validate'
         cfg.pop('type')
+
         return shape_validate(
             cfg, self.shape, self.manager.resource_type.service)
 
