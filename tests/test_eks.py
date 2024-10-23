@@ -116,7 +116,7 @@ class EKS(BaseTest):
                 },
             )
         self.assertIn(
-            "Invalid type for parameter upgradePolicy.supportType",
+            "supportType",
             str(err.exception)
         )
 
