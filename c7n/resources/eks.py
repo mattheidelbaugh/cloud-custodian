@@ -186,7 +186,6 @@ class UpdateConfig(Action, metaclass=ExpandedSchemaMeta):
         cfg = dict(self.data)
         cfg['name'] = 'validate'
         cfg.pop('type')
-
         return shape_validate(
             cfg, self.shape, self.manager.resource_type.service)
 
