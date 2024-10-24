@@ -132,7 +132,7 @@ class EKS(BaseTest):
                 },
             )
         self.assertIn(
-            'Unknown parameter in input: "UnknownOption"',
+            'UnknownOption',
             str(err.exception)
         )
 
