@@ -31,8 +31,6 @@ class PmtcryptApp(query.QueryResourceManager):
 
 
 
-##################################
-
 @PmtcryptApp.action_registry.register('tag')
 class PmtcryptTag(Tag):
     """Action to tag a payment-cryptography"""
@@ -46,6 +44,24 @@ class PmtcryptTag(Tag):
             tags = [{'Key': k, 'Value': v} for k, v in self.data.get('tags',{}).items()]
             self.manager.retry(
                 client.tag_resource, ResourceArn=r["KeyArn"], Tags=tags)
+            
+@PmtcryptApp.action_registry.register('mark-for-op')
+class PmtcryptTag(TagDelayedAction):
+    """Action to mark a payment-cryptography resource for future action"""
+
+
+    schema = type_schema('mark-for-op', rinherit=TagDelayedAction.schema)
+    batch_size = 1
+    permissions = ('payment-cryptography:TagResource')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('payment-cryptography')
+        k = self.data.get('tag','')
+        v = self.data.get('msg','{op}')
+        for r in resources:
+            tags = [{'Key': k, 'Value': v.format(op=self.data.get('op', '{action_date}'))}]
+            self.manager.retry(
+                client.tag_resource, ResourceArn=r["KeyArn"], Tags=tags)
 
 
 @PmtcryptApp.filter_registry.register('marked-for-op')
@@ -54,7 +70,7 @@ class PmtcryptMarked(TagActionFilter):
     schema = type_schema('marked-for-op', rinherit=TagActionFilter.schema)   
     permissions = ('payment-cryptography:TagResource')
 
-    def process(self, resources):
+    def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('payment-cryptography')
         tag_key =  self.data.get('tag', '')
         op = self.data.get('op', '{op}')
@@ -68,10 +84,17 @@ class PmtcryptMarked(TagActionFilter):
                     marked.append(r)
                     break
         return marked
+    
+@PmtcryptApp.action_registry.register('remove-tag')
+class PmtcryptRemoveTag(RemoveTag):
+    """Action to remove tag(s) from payment-cryptography resources"""
 
-
-
-
+    batch_size = 1
+    permissions = ('payment-cryptography:untag_resource')
+    def process_resource_set(self, client, resources, tags):
+        for r in resources:
+            self.manager.retry(
+                client.untag_resource, ResourceArn=r["KeyArn"], TagKeys=tags)
 
 
 @PmtcryptApp.action_registry.register('delete')
