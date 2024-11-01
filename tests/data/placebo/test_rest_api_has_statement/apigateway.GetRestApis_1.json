@@ -47,10 +47,7 @@
                 },
                 "policy": "{\\\"Version\\\":\\\"2012-10-17\\\",\\\"Statement\\\":[{\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":{\\\"AWS\\\":\\\"arn:aws:iam::123456789012:root\\\"},\\\"Action\\\":\\\"execute-api:Invoke\\\",\\\"Resource\\\":\\\"*\\\"}]}",
                 "tags": {
-                    "ASV": "ASVENTERPRISECLOUDCONTROL",
-                    "BA": "BAENTERPRISECLOUDCONTROL",
-                    "OwnerContact": "policyfoundry@capitalone.com",
-                    "ctls_sbx_cleanup_exclude": "true"
+                    "test": "test-val"
                 },
                 "disableExecuteApiEndpoint": false,
                 "rootResourceId": "snilzemip4"
