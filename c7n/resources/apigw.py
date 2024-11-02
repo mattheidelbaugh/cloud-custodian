@@ -208,9 +208,8 @@ class HasStatementRestApi(HasStatementFilter):
 
     def process(self, resources, event=None):
         for r in resources:
-            if self.policy_attribute in r:
-                r[self.policy_attribute] = bytes(
-                    r[self.policy_attribute], 'utf-8').decode('unicode_escape')
+            if policy := r.get(self.policy_attribute):
+                r[self.policy_attribute] = policy.replace('\\', '')
         return super().process(resources, event)
 
 
