@@ -95,6 +95,7 @@ class HasStatementFilter(Filter):
 
         required_statements = format_string_values(list(self.data.get('statements', [])),
                                                    **self.get_std_format_args(resource))
+
         for required_statement in required_statements:
             for statement in statements:
                 found = 0
