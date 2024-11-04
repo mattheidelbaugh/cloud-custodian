@@ -4,7 +4,7 @@
 from c7n.manager import resources
 from c7n import query
 from c7n.utils import local_session, type_schema
-from c7n.tags import Tag, RemoveTag, TagDelayedAction, TagActionFilter, universal_augment
+from c7n.tags import Tag, RemoveTag, universal_augment
 from c7n.actions import BaseAction
 
 class PmtcryptAppJobDescribe(query.DescribeSource):
@@ -18,7 +18,6 @@ class PmtcryptApp(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = 'payment-cryptography'
         enum_spec = ('list_keys', 'Keys[]', None)
-        universal_taggable = object()
         cfn_type = "AWS::PaymentCryptography::Key"
         arn = id = name = "KeyArn"
         permission_prefix = 'payment-cryptography'
@@ -28,8 +27,6 @@ class PmtcryptApp(query.QueryResourceManager):
         
     
     source_mapping = {"describe":PmtcryptAppJobDescribe,}
-
-
 
 @PmtcryptApp.action_registry.register('tag')
 class PmtcryptTag(Tag):
@@ -44,47 +41,8 @@ class PmtcryptTag(Tag):
             tags = [{'Key': k, 'Value': v} for k, v in self.data.get('tags',{}).items()]
             self.manager.retry(
                 client.tag_resource, ResourceArn=r["KeyArn"], Tags=tags)
-            
-@PmtcryptApp.action_registry.register('mark-for-op')
-class PmtcryptTag(TagDelayedAction):
-    """Action to mark a payment-cryptography resource for future action"""
 
 
-    schema = type_schema('mark-for-op', rinherit=TagDelayedAction.schema)
-    batch_size = 1
-    permissions = ('payment-cryptography:TagResource')
-
-    def process(self, resources):
-        client = local_session(self.manager.session_factory).client('payment-cryptography')
-        k = self.data.get('tag','')
-        v = self.data.get('msg','{op}')
-        for r in resources:
-            tags = [{'Key': k, 'Value': v.format(op=self.data.get('op', '{action_date}'))}]
-            self.manager.retry(
-                client.tag_resource, ResourceArn=r["KeyArn"], Tags=tags)
-
-
-@PmtcryptApp.filter_registry.register('marked-for-op')
-class PmtcryptMarked(TagActionFilter):
-    """Filter to check if """
-    schema = type_schema('marked-for-op', rinherit=TagActionFilter.schema)   
-    permissions = ('payment-cryptography:TagResource')
-
-    def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client('payment-cryptography')
-        tag_key =  self.data.get('tag', '')
-        op = self.data.get('op', '{op}')
-        marked = []
-        for r in resources:
-            tags = client.list_tags_for_resource(ResourceArn=r["KeyArn"]).get('Tags', [])
-            if tags is None:
-                tags = []
-            for tag in tags:    
-                if tag['Key'] == tag_key and op in tag['Value']:
-                    marked.append(r)
-                    break
-        return marked
-    
 @PmtcryptApp.action_registry.register('remove-tag')
 class PmtcryptRemoveTag(RemoveTag):
     """Action to remove tag(s) from payment-cryptography resources"""
@@ -99,7 +57,7 @@ class PmtcryptRemoveTag(RemoveTag):
 
 @PmtcryptApp.action_registry.register('delete')
 class PmtcryptDelete(BaseAction):
-    """Action to tag a payment-cryptography resource for derferred action
+    """Action to delete a payment-cryptography resource
     :example 
 
     .. code-block:: yaml
