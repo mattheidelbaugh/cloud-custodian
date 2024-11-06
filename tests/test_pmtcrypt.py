@@ -1,46 +1,69 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import json
-import time
-from unittest.mock import patch
-from datetime import datetime, timedelta
 
+# from unittest.mock import
+from .common import BaseTest
 
-from c7n.resources.aws import shape_validate
-from .common import BaseTest, functional
-
-from c7n.config import Config
-from c7n.executor import MainThreadExecutor
-from c7n.filters.iamaccess import CrossAccountAccessFilter
 
 class PmtcryptTest(BaseTest):
-    def test_mark_for_op(self):
-        session_factory = self.replay_flight_data('test_pmtcrypt_mark_for_op')
+    def test_tag_action(self):
+        session_factory = self.replay_flight_data('test_pmtcrypt__tag_action')
         p = self.load_policy(
             {
-                "name": "mark-unused-keys-for-deletion",
+                "name": "tag-payment-cryptography",
                 "resource": "payment-cryptography",
-                "filters": [{"tag:custodian_cleanup": "absent"}],
-                "actions" : [
-                    {
-                        "type": "mark-for-op",
-                        "tag": "custodian_cleanup",
-                        "msg": "Unused Key - : {op}@{action_date}",
-                        "op" : "delete",
-                        "days": 4,
-                    }
+                "filters": [{"tag:Environment": "Dev"}],
+                "actions": [
+                    [{"type": "tag", "key": "Department", "value": "International"}],
                 ]
             },
             session_factory=session_factory,
         )
 
-        resources= p.run()
-        (json.dumps(resources, indent=2))
+        resources = p.run()
         self.assertEqual(len(resources), 1)
-        tag_value = resources[0] ["Tags"] [0] ["Value"]
-        action_date = (datetime.utcnow()+ timedelta(days=4)).strftime('%y/%m/%d')
-        self.assertIn(f"delete@{action_date}", tag_value)
- 
+        client = session_factory().client("payment-cryptography")
+        tags = client.tag_resource(ResourceArn=resources[0]["KeyArn"], Tags=tags)
+        self.assertEqual(tags[0]["Value"], "International")
 
-        
-        
+    def test_remove_tag(self):
+        session_factory = self.replay_flight_data(
+            "test_payment-cryptography_remove_tag"
+        )
+        p = self.load_policy(
+            {
+                "name": "untag-payment-cryptography",
+                "resource": "payment-cryptography",
+                "filters": [{"tag:Environment": "Dev"}],
+                "actions": [{"type": "remove-tag", "tags": ["Department"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("payment-cryptography")
+        tags = client.untag_resource(ResourceArn=resources[0]["KeyArn"])["Tags"]
+        self.assertEqual(len(tags), 0)
+
+    def test_delete_(self):
+        session_factory = self.replay_flight_data(
+            "test_delete_payment-cryptography"
+        )
+        p = self.load_policy(
+            {
+                "name": "delete-payment-cryptography",
+                "resource": "payment-cryptography",
+                "filters": [{"tag:owner": "policy"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("payment-cryptography")
+        key = client.delete_key(
+            KeyArn=resources[0]["KeyArn"]
+        )
+        self.assertTrue(key["KeyState"], "DELETE_PENDING")
