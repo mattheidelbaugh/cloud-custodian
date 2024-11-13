@@ -45,7 +45,7 @@ class PmtcryptTest(BaseTest):
 
     def test_delete_(self):
         session_factory = self.replay_flight_data(
-            "test_delete_payment-cryptography"
+            "test_payment-cryptography_delete"
         )
         p = self.load_policy(
             {
