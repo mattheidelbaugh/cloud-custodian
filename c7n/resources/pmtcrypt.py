@@ -4,14 +4,17 @@
 from c7n.manager import resources
 from c7n import query
 from c7n.utils import local_session, type_schema
-from c7n.tags import Tag, RemoveTag, universal_augment
+from c7n.tags import Tag, RemoveTag
 from c7n.actions import BaseAction
 
 
 class PmtcryptAppJobDescribe(query.DescribeSource):
-
     def augment(self, resources):
-        return universal_augment(self.manager, super().augment(resources))
+        client = local_session(self.manager.session_factory).client('payment-cryptography')
+        for r in resources:
+            tags = client.list_tags_for_resource(ResourceArn=r["KeyArn"]).get('Tags', [])
+            r['Tags'] = tags
+        return resources
 
 
 @resources.register('payment-cryptography')
@@ -37,12 +40,9 @@ class PmtcryptTag(Tag):
     batch_size = 1
     permissions = ('payment-cryptography:TagResource')
 
-    def process(self, resources):
-        client = local_session(self.manager.session_factory).client('payment-cryptography')
+    def process_resource_set(self, client, resources, tags):
         for r in resources:
-            tags = [{'Key': k, 'Value': v} for k, v in self.data.get('tags', {}).items()]
-            self.manager.retry(
-                client.tag_resource, ResourceArn=r["KeyArn"], Tags=tags)
+            self.manager.retry(client.tag_resource, ResourceArn=r["KeyArn"], Tags=tags)
 
 
 @PmtcryptApp.action_registry.register('remove-tag')
@@ -82,4 +82,4 @@ class PmtcryptDelete(BaseAction):
         client = local_session(self.manager.session_factory).client('payment-cryptography')
         for r in resource:
             self.manager.retry(
-                client.delete_key, ResourceArn=r["KeyArn"])
+                client.delete_key, KeyIdentifier=r["KeyArn"])

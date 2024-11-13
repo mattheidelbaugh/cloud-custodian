@@ -6,14 +6,13 @@ from .common import BaseTest
 
 class PmtcryptTest(BaseTest):
     def test_tag_action(self):
-        session_factory = self.replay_flight_data('test_pmtcrypt__tag_action')
+        session_factory = self.replay_flight_data('test_pmtcrypt_tag_action')
         p = self.load_policy(
             {
                 "name": "tag-payment-cryptography",
                 "resource": "payment-cryptography",
-                "filters": [{"tag:Environment": "Dev"}],
                 "actions": [
-                    [{"type": "tag", "key": "Department", "value": "International"}],
+                    {"type": "tag", "key": "Department", "value": "International"},
                 ]
             },
             session_factory=session_factory,
@@ -22,7 +21,7 @@ class PmtcryptTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         client = session_factory().client("payment-cryptography")
-        tags = client.tag_resource(ResourceArn=resources[0]["KeyArn"], Tags=tags)
+        tags = client.list_tags_for_resource(ResourceArn=resources[0]["KeyArn"])["Tags"]
         self.assertEqual(tags[0]["Value"], "International")
 
     def test_remove_tag(self):
@@ -33,8 +32,7 @@ class PmtcryptTest(BaseTest):
             {
                 "name": "untag-payment-cryptography",
                 "resource": "payment-cryptography",
-                "filters": [{"tag:Environment": "Dev"}],
-                "actions": [{"type": "remove-tag", "tags": ["Department"]}],
+                "actions": [{"type": "remove-tag", "tags": ["ResourceOwner"]}],
             },
             session_factory=session_factory,
         )
@@ -42,7 +40,7 @@ class PmtcryptTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
         client = session_factory().client("payment-cryptography")
-        tags = client.untag_resource(ResourceArn=resources[0]["KeyArn"])["Tags"]
+        tags = client.list_tags_for_resource(ResourceArn=resources[0]["KeyArn"])["Tags"]
         self.assertEqual(len(tags), 0)
 
     def test_delete_(self):
@@ -53,7 +51,7 @@ class PmtcryptTest(BaseTest):
             {
                 "name": "delete-payment-cryptography",
                 "resource": "payment-cryptography",
-                "filters": [{"tag:owner": "policy"}],
+                "filters": [{"tag:Department": "International"}],
                 "actions": [{"type": "delete"}],
             },
             session_factory=session_factory,
@@ -62,7 +60,7 @@ class PmtcryptTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
         client = session_factory().client("payment-cryptography")
-        key = client.delete_key(
-            KeyArn=resources[0]["KeyArn"]
-        )
+        key = client.get_key(
+            KeyIdentifier=resources[0]["KeyArn"]
+        )["Key"]
         self.assertTrue(key["KeyState"], "DELETE_PENDING")
