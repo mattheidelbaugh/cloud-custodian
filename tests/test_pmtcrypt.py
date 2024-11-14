@@ -33,7 +33,7 @@ class PmtcryptTest(BaseTest):
             {
                 "name": "untag-payment-cryptography",
                 "resource": "payment-cryptography",
-                "actions": [{"type": "remove-tag", "tags": ["ResourceOwner"]}],
+                "actions": [{"type": "untag", "tags": ["ResourceOwner"]}],
             },
             session_factory=session_factory,
         )
