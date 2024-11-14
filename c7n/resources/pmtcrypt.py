@@ -45,12 +45,12 @@ class PmtcryptTag(Tag):
             self.manager.retry(client.tag_resource, ResourceArn=r["KeyArn"], Tags=tags)
 
 
-@PmtcryptApp.action_registry.register('remove-tag')
+@PmtcryptApp.action_registry.register('untag')
 class PmtcryptRemoveTag(RemoveTag):
     """Action to remove tag(s) from payment-cryptography resources"""
 
     batch_size = 1
-    permissions = ('payment-cryptography:untag_resource',)
+    permissions = ('payment-cryptography:UntagResource',)
 
     def process_resource_set(self, client, resources, tags):
         for r in resources:
@@ -76,7 +76,7 @@ class PmtcryptDelete(BaseAction):
 
     batch_size = 1
     schema = type_schema('delete')
-    permissions = ('payment-cryptography:delete_key',)
+    permissions = ('payment-cryptography:DeleteKey',)
 
     def process(self, resource):
         client = local_session(self.manager.session_factory).client('payment-cryptography')
