@@ -38,7 +38,7 @@ class PmtcryptTag(Tag):
     """Action to tag a payment-cryptography"""
 
     batch_size = 1
-    permissions = ('payment-cryptography:TagResource')
+    permissions = ('payment-cryptography:TagResource',)
 
     def process_resource_set(self, client, resources, tags):
         for r in resources:
@@ -50,7 +50,7 @@ class PmtcryptRemoveTag(RemoveTag):
     """Action to remove tag(s) from payment-cryptography resources"""
 
     batch_size = 1
-    permissions = ('payment-cryptography:untag_resource')
+    permissions = ('payment-cryptography:untag_resource',)
 
     def process_resource_set(self, client, resources, tags):
         for r in resources:
