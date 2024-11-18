@@ -49,15 +49,15 @@ class DirectorySecurityGroupFilter(SecurityGroupFilter):
 class DirectoryVpcFilter(VpcFilter):
 
     RelatedIdsExpression = "VpcSettings.VpcId"
-    
+
 
 @Directory.filter_registry.register('is-log-forwarding')
 class DirectoryLogSubscriptionFilter(Filter):
-    
+
     annotation_key = "c7n:LogSubscriptions"
     permissions = ("ds:ListLogSubscriptions",)
     schema = type_schema('is-log-forwarding')
-    
+
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('ds')
         results = []
@@ -71,7 +71,6 @@ class DirectoryLogSubscriptionFilter(Filter):
                 results.append(r)
 
         return results
-            
 
 
 @Directory.action_registry.register('tag')

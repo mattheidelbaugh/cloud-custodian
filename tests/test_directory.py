@@ -158,9 +158,9 @@ class DirectoryTests(BaseTest):
         remainder = client.describe_directories()["DirectoryDescriptions"]
         self.assertEqual(len(remainder), 2)
         self.assertEqual(remainder[1]["Stage"], "Deleting")
-        
+
     def test_directory_log_subscriptions(self):
-        factory = self.record_flight_data("test_directory_log_subscriptions")
+        factory = self.replay_flight_data("test_directory_log_subscriptions")
         p = self.load_policy(
             {
                 "name": "directory-log-subscriptions",
@@ -173,6 +173,8 @@ class DirectoryTests(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["DirectoryId"], "d-9067d77ae2")
+        assert "c7n:LogSubscriptions" in resources[0]
 
 
 class CloudDirectoryQueryParse(BaseTest):
