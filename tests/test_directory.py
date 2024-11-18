@@ -174,7 +174,7 @@ class DirectoryTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["DirectoryId"], "d-9067d77ae2")
-        assert "c7n:LogSubscriptions" in resources[0]
+        self.assertIn("c7n:LogSubscriptions", resources[0])
 
     def test_directory_ldap_setting_no_settings(self):
         factory = self.replay_flight_data("test_directory_ldap_setting")
