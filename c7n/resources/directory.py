@@ -3,6 +3,7 @@
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema, QueryParser
+from c7n.filters.core import Filter
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.tags import Tag, RemoveTag, universal_augment, TagDelayedAction, TagActionFilter
 from c7n.actions import BaseAction
@@ -48,6 +49,29 @@ class DirectorySecurityGroupFilter(SecurityGroupFilter):
 class DirectoryVpcFilter(VpcFilter):
 
     RelatedIdsExpression = "VpcSettings.VpcId"
+    
+
+@Directory.filter_registry.register('is-log-forwarding')
+class DirectoryLogSubscriptionFilter(Filter):
+    
+    annotation_key = "c7n:LogSubscriptions"
+    permissions = ("ds:ListLogSubscriptions",)
+    schema = type_schema('is-log-forwarding')
+    
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ds')
+        results = []
+        for r in resources:
+            subs = self.manager.retry(
+                client.list_log_subscriptions,
+                DirectoryId=r["DirectoryId"]
+            )["LogSubscriptions"]
+            if subs:
+                r[self.annotation_key] = subs
+                results.append(r)
+
+        return results
+            
 
 
 @Directory.action_registry.register('tag')
