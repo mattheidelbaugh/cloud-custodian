@@ -31,7 +31,7 @@ class RestAccount(ResourceManager):
 
     filter_registry = FilterRegistry('rest-account.filters')
     action_registry = ActionRegistry('rest-account.actions')
-    retry = staticmethod(get_retry(('TooManyRequestsException')))
+    retry = staticmethod(get_retry(('TooManyRequestsException',)))
 
     class resource_type(query.TypeInfo):
         service = 'apigateway'
