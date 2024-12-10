@@ -211,8 +211,16 @@ class TestRestApi(BaseTest):
                                 "Principal": {
                                     "AWS": "arn:aws:iam::123456789012:root",
                                 },
-                                "Resource": "*"
                             },
+                            {
+                                "Effect": "Allow",
+                                "Action": "execute-api:Invoke",
+                                "Condition": {
+                                    "StringEquals": {
+                                        "aws:SourceVpc": ["vpc-1a2b3c4d", "vpc-abc123"]
+                                    }
+                                }
+                            }
                         ]
                     },
                 ],
@@ -221,6 +229,7 @@ class TestRestApi(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'c7n-test')
 
     def test_rest_api_rate_limit(self):
         session_factory = self.replay_flight_data('test_rest_api_rate_limit')
