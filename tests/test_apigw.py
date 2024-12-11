@@ -242,6 +242,17 @@ class TestRestApi(BaseTest):
             resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_rest_api_exception(self):
+        session_factory = self.replay_flight_data('test_rest_api_exception')
+        p = self.load_policy(
+            {'name': 'api-exception',
+             'resource': 'aws.rest-api'},
+            session_factory=session_factory
+        )
+        with self.assertRaises(ClientError) as e:
+            p.run()
+        self.assertEqual(e.exception.response['Error']['Code'], 'AccessDeniedException')
+
 
 class TestRestResource(BaseTest):
 
