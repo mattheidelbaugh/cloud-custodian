@@ -88,6 +88,18 @@ class TestRestAccount(BaseTest):
             p.run()
         self.assertEqual(e.exception.response['Error']['Code'], 'AccessDeniedException')
 
+    def test_rest_account_rate_limit(self):
+        session_factory = self.replay_flight_data('test_rest_account_rate_limit')
+        p = self.load_policy(
+            {'name': 'rest-account-rate-limit',
+             'resource': 'aws.rest-account'},
+            session_factory=session_factory
+        )
+        with patch('c7n.utils.time.sleep', new_callable=time.sleep(0)) as func:
+            resources = p.run()
+        self.assertTrue(func.called)
+        self.assertEqual(len(resources), 1)
+
 
 class TestRestApi(BaseTest):
 
@@ -241,17 +253,6 @@ class TestRestApi(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'c7n-test')
-
-    def test_rest_api_rate_limit(self):
-        session_factory = self.replay_flight_data('test_rest_api_rate_limit')
-        p = self.load_policy(
-            {'name': 'api-rate-limit',
-             'resource': 'aws.rest-api'},
-            session_factory=session_factory
-        )
-        with patch('c7n.utils.time.sleep', new_callable=time.sleep(0)):
-            resources = p.run()
-        self.assertEqual(len(resources), 1)
 
 
 class TestRestResource(BaseTest):
