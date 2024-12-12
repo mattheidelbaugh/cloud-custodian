@@ -77,6 +77,17 @@ class TestRestAccount(BaseTest):
         after_account, = p.resource_manager._get_account()
         self.assertEqual(after_account["cloudwatchRoleArn"], log_role)
 
+    def test_rest_account_exception(self):
+        session_factory = self.replay_flight_data('test_rest_account_exception')
+        p = self.load_policy(
+            {'name': 'rest-account-exception',
+             'resource': 'aws.rest-account'},
+            session_factory=session_factory
+        )
+        with self.assertRaises(ClientError) as e:
+            p.run()
+        self.assertEqual(e.exception.response['Error']['Code'], 'AccessDeniedException')
+
 
 class TestRestApi(BaseTest):
 
@@ -241,17 +252,6 @@ class TestRestApi(BaseTest):
         with patch('c7n.utils.time.sleep', new_callable=time.sleep(0)):
             resources = p.run()
         self.assertEqual(len(resources), 1)
-
-    def test_rest_api_exception(self):
-        session_factory = self.replay_flight_data('test_rest_api_exception')
-        p = self.load_policy(
-            {'name': 'api-exception',
-             'resource': 'aws.rest-api'},
-            session_factory=session_factory
-        )
-        with self.assertRaises(ClientError) as e:
-            p.run()
-        self.assertEqual(e.exception.response['Error']['Code'], 'AccessDeniedException')
 
 
 class TestRestResource(BaseTest):
