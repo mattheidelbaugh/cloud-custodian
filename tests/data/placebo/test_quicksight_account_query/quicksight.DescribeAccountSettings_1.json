@@ -1,11 +1,16 @@
 {
-    "status_code": 403,
+    "status_code": 200,
     "data": {
-        "Error": {
-            "Message": "User: arn:aws:sts::644160558196:assumed-role/GR_GG_COF_AWS_CoreEngineering/eah523 is not authorized to perform: quicksight:DescribeAccountSettings on resource: arn:aws:quicksight:us-east-1:644160558196:* because no resource-based policy allows the quicksight:DescribeAccountSettings action",
-            "Code": "AccessDeniedException"
-        },
         "ResponseMetadata": {},
-        "Message": "User: arn:aws:sts::644160558196:assumed-role/GR_GG_COF_AWS_CoreEngineering/eah523 is not authorized to perform: quicksight:DescribeAccountSettings on resource: arn:aws:quicksight:us-east-1:644160558196:* because no resource-based policy allows the quicksight:DescribeAccountSettings action"
+        "Status": 200,
+        "AccountSettings": {
+            "AccountName": "custodian-skunk-works",
+            "Edition": "ENTERPRISE",
+            "DefaultNamespace": "default",
+            "NotificationEmail": "matthew.heidelbaugh@capitalone.com",
+            "PublicSharingEnabled": false,
+            "TerminationProtectionEnabled": true
+        },
+        "RequestId": "5b7abeba-7ae1-4f54-93b5-9aacf403466a"
     }
 }

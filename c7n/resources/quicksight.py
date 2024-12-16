@@ -47,7 +47,8 @@ class QuicksightGroup(query.QueryResourceManager):
     source_mapping = {
         "describe": DescribeQuicksight,
     }
-    
+
+
 @resources.register("quicksight-dashboard")
 class QuicksighDashboard(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
@@ -61,7 +62,7 @@ class QuicksighDashboard(query.QueryResourceManager):
     source_mapping = {
         "describe": DescribeQuicksight,
     }
-    
+
 
 @resources.register("quicksight-account")
 class QuicksightAccount(ResourceManager):
@@ -95,7 +96,6 @@ class QuicksightAccount(ResourceManager):
         return self.resource_type
 
     def _get_account(self):
-        import pdb; pdb.set_trace()
         client = local_session(self.session_factory).client('quicksight')
         try:
             account = self.retry(client.describe_account_settings,
@@ -105,7 +105,7 @@ class QuicksightAccount(ResourceManager):
             if e.response['Error']['Code'] in ('ResourceNotFoundException',):
                 return []
             raise
-        
+
         account.pop('ResponseMetadata', None)
         account['account_id'] = 'quicksight-settings'
         return [account]
