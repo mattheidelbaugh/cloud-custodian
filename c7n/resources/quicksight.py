@@ -49,21 +49,6 @@ class QuicksightGroup(query.QueryResourceManager):
     }
 
 
-@resources.register("quicksight-dashboard")
-class QuicksighDashboard(query.QueryResourceManager):
-    class resource_type(query.TypeInfo):
-        service = "quicksight"
-        enum_spec = ('list_dashboards', 'DashboardSummaryList', None)
-        arn_type = "dashboard"  # TODO verify
-        arn = "Arn"
-        id = "DashboardId"
-        name = "Name"
-
-    source_mapping = {
-        "describe": DescribeQuicksight,
-    }
-
-
 @resources.register("quicksight-account")
 class QuicksightAccount(ResourceManager):
     # note this is not using a regular resource manager or type info
