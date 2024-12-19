@@ -25,7 +25,7 @@ class KendraIndex(QueryResourceManager):
         name = 'Name'
         date = 'UpdatedAt'
         universal_taggable = object()
-        cfn_type = config_type = 'AWS::Kendra::Index'
+        cfn_type = 'AWS::Kendra::Index'
 
     source_mapping = {
         'describe': DescribeIndex,
