@@ -722,7 +722,7 @@ class PolicyMetaLint(BaseTest):
     def test_resource_meta_with_class(self):
         missing = set()
         for k, v in manager.resources.items():
-            if k in ('rest-account', 'account'):
+            if k in ('rest-account', 'account', 'quicksight-account'):
                 continue
             if not issubclass(v.resource_type, TypeInfo):
                 missing.add(k)
