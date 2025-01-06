@@ -580,10 +580,31 @@ def resource_vocabulary(cloud_name=None, qualify_name=True, aliases=True):
 
 
 class ExpandedSchemaMeta(type):
+    """Expand an element's schema using service model shape data
 
-    # resource id key passed to api call to be dropped from schema
-    resource_id_key = ''
-    type_map = {
+        Repurpose some of the shape discovery/validation logic in
+        c7n.resources.aws.shape_validate() to dynamically expand
+        element schema using the latest service model shape information.
+
+        Include available properties, their types, and enumerations of
+        possible values where available.  Assumes the use of type_schema().
+
+        Attributes:
+            service (str): The AWS service for the element. (required)
+            shape_name (str): The service model request shape name. (required)
+            attributes_key (str): Some Custodian actions use a top-level
+                'attributes' key to encapsulate API arguments.  This can be
+                specified here.
+            resource_id_param (str): The resource ID paremeter in the API call
+                to be dropped from the schema.
+     """
+
+    service = ''
+    shape_name = ''
+    attributes_key = ''
+    resource_id_param = ''
+
+    TYPE_MAP = {
         'string': 'string',
         'structure': 'object',
         'list': 'array',
@@ -592,30 +613,31 @@ class ExpandedSchemaMeta(type):
     }
 
     def __init__(cls, name, bases, dct):
-        """Expand an element's schema using service model shape data
-
-        Repurpose some of the shape discovery/validation logic in
-        c7n.resources.aws.shape_validate() to dynamically expand
-        element schema using the latest service model shape information.
-
-        Include available properties, their types, and enumerations of
-        possible values where available.  Assumes the use of type_schema().
-        """
         session = fake_session()._session
-        model = session.get_service_model(cls.service)
-        shape = model.shape_for(cls.shape)
 
-        if getattr(cls, 'attributes_key', None):
-            cls.schema['properties'][cls.attributes_key].update(cls._expand_object_shape(shape))
+        if not cls.service:
+            raise AttributeError(
+                "The service name must be specified in the 'service' attribute for dynamic schema "
+                "generation.")
+        model = session.get_service_model(cls.service)
+
+        if not cls.shape:
+            raise AttributeError(
+                "The request shape must be specified in the 'shape_name' attribute for dynamic "
+                "schema generation. Shape name can be found in the service model.")
+        shape = model.get_shape_for(cls.shape_name)
+
+        if attributes_key := getattr(cls, 'attributes_key', None):
+            cls.schema['properties'][attributes_key].update(cls._expand_object_shape(shape))
         else:
             cls.schema['properties'].update(cls._expand_object_shape(shape))
 
     def _expand_object_shape(cls, shape):
         schema = {}
         for member, member_shape in shape.members.items():
-            if cls.resource_id_key == member:
+            if cls.resource_id_param == member:
                 continue
-            member_schema = {'type': cls.type_map.get(member_shape.type_name)}
+            member_schema = {'type': cls.TYPE_MAP.get(member_shape.type_name)}
             if enum := getattr(member_shape, 'enum', None):
                 member_schema['enum'] = enum
             if member_shape.type_name == 'structure':
@@ -628,7 +650,7 @@ class ExpandedSchemaMeta(type):
                     }
                 else:
                     member_schema["items"] = {
-                        'type': cls.type_map.get(member_shape.member.type_name)
+                        'type': cls.TYPE_MAP.get(member_shape.member.type_name)
                     }
             schema[member] = member_schema
         return schema

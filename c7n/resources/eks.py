@@ -179,7 +179,7 @@ class UpdateConfig(Action, metaclass=ExpandedSchemaMeta):
 
     permissions = ('eks:UpdateClusterConfig',)
     resource_id_key = 'name'
-    shape = 'UpdateClusterConfigRequest'
+    shape_name = 'UpdateClusterConfigRequest'
     service = 'eks'
 
     def validate(self):
