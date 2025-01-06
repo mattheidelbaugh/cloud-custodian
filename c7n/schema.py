@@ -621,11 +621,11 @@ class ExpandedSchemaMeta(type):
                 "generation.")
         model = session.get_service_model(cls.service)
 
-        if not cls.shape:
+        if not cls.shape_name:
             raise AttributeError(
                 "The request shape must be specified in the 'shape_name' attribute for dynamic "
                 "schema generation. Shape name can be found in the service model.")
-        shape = model.get_shape_for(cls.shape_name)
+        shape = model.shape_for(cls.shape_name)
 
         if attributes_key := getattr(cls, 'attributes_key', None):
             cls.schema['properties'][attributes_key].update(cls._expand_object_shape(shape))
