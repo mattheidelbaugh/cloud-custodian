@@ -54,8 +54,8 @@ class QuicksightAccount(ResourceManager):
     # note this is not using a regular resource manager or type info
     # its a pseudo resource, like an aws account
 
-    filter_registry = FilterRegistry('rest-account.filters')
-    action_registry = ActionRegistry('rest-account.actions')
+    filter_registry = FilterRegistry('quicksight-account.filters')
+    action_registry = ActionRegistry('quicksight-account.actions')
     retry = staticmethod(get_retry((
         'ThrottlingException', 'InternalFailureException',
         'ResourceUnavailableException')))
