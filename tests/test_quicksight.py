@@ -3,6 +3,8 @@
 
 
 from .common import BaseTest
+from unittest.mock import patch
+from botocore.exceptions import ClientError
 
 
 # @terraform("quicksight_group")
@@ -32,3 +34,15 @@ class TestQuicksight(BaseTest):
 
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+
+    def test_quicksight_account_get_account_not_found(self):
+        factory = self.record_flight_data("test_quicksight_account_not_found")
+
+        policy = self.load_policy({
+            "name": "test-aws-quicksight-account",
+            "resource": "aws.quicksight-account"
+        }, session_factory=factory)
+
+        resources = policy.run()
+        self.assertEqual(resources, [])
+    
