@@ -4,8 +4,8 @@
 from pytest_terraform import terraform
 
 from .common import BaseTest
-from unittest.mock import patch
 from botocore.exceptions import ClientError
+from unittest.mock import patch
 
 
 @terraform("quicksight_group")
@@ -36,8 +36,15 @@ class TestQuicksight(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
-    def test_quicksight_account_get_account_not_found(self):
-        factory = self.record_flight_data("test_quicksight_account_not_found")
+    @patch('c7n.resources.quicksight.local_session')
+    def test_quicksight_account_get_account_not_found(self, local_session_mock):
+        session_mock = local_session_mock.return_value
+        client_mock = session_mock.client.return_value
+        client_mock.describe_account_settings.side_effect = ClientError(
+            {"Error": {"Code": "ResourceNotFoundException"}}, "describe_account_settings"
+        )
+
+        factory = self.replay_flight_data("test_quicksight_account_not_found")
 
         policy = self.load_policy({
             "name": "test-aws-quicksight-account",
@@ -46,4 +53,3 @@ class TestQuicksight(BaseTest):
 
         resources = policy.run()
         self.assertEqual(resources, [])
-    
