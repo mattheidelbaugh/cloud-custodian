@@ -187,7 +187,7 @@ class UpdateConfig(Action, metaclass=ExpandedSchemaMeta):
         cfg['name'] = 'validate'
         cfg.pop('type')
         return shape_validate(
-            cfg, self.shape, self.manager.resource_type.service)
+            cfg, self.shape_name, self.manager.resource_type.service)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('eks')
