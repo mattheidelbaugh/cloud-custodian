@@ -65,6 +65,7 @@ class QuicksightAccount(ResourceManager):
         name = id = 'account_id'
         dimension = None
         arn = False
+        global_resource = True
 
     @classmethod
     def get_permissions(cls):
