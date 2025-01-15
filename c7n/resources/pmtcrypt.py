@@ -9,12 +9,12 @@ from c7n.actions import BaseAction
 
 
 class PmtcryptAppJobDescribe(query.DescribeSource):
-    def augment(self, resources):
+    def augment(self, pmt_crypt_keys):
         client = local_session(self.manager.session_factory).client('payment-cryptography')
-        for r in resources:
+        for r in pmt_crypt_keys:
             tags = client.list_tags_for_resource(ResourceArn=r["KeyArn"]).get('Tags', [])
             r['Tags'] = tags
-        return resources
+        return pmt_crypt_keys
 
 
 @resources.register('payment-cryptography')
@@ -22,7 +22,7 @@ class PmtcryptApp(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'payment-cryptography'
-        enum_spec = ('list_keys', 'Keys[]', None)
+        enum_spec = ('list_keys', 'Keys[]',{'KeyState': 'CREATE_COMPLETE'} )
         cfn_type = "AWS::PaymentCryptography::Key"
         arn = id = name = "KeyArn"
         permission_prefix = 'payment-cryptography'
@@ -35,7 +35,7 @@ class PmtcryptApp(query.QueryResourceManager):
 
 @PmtcryptApp.action_registry.register('tag')
 class PmtcryptTag(Tag):
-    """Action to tag a payment-cryptography"""
+    """Action to tag a payment-cryptography-key"""
 
     batch_size = 1
     permissions = ('payment-cryptography:TagResource',)
@@ -45,9 +45,9 @@ class PmtcryptTag(Tag):
             self.manager.retry(client.tag_resource, ResourceArn=r["KeyArn"], Tags=tags)
 
 
-@PmtcryptApp.action_registry.register('untag')
+@PmtcryptApp.action_registry.register('remove-tag')
 class PmtcryptRemoveTag(RemoveTag):
-    """Action to remove tag(s) from payment-cryptography resources"""
+    """Action to remove tag(s) from a payment-cryptography-key"""
 
     batch_size = 1
     permissions = ('payment-cryptography:UntagResource',)
@@ -60,7 +60,7 @@ class PmtcryptRemoveTag(RemoveTag):
 
 @PmtcryptApp.action_registry.register('delete')
 class PmtcryptDelete(BaseAction):
-    """Action to delete a payment-cryptography resource
+    """Action to delete a payment-cryptography-key
     :example
 
     .. code-block:: yaml
