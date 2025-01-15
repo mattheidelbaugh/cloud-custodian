@@ -22,7 +22,7 @@ class PmtcryptApp(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'payment-cryptography'
-        enum_spec = ('list_keys', 'Keys[]',{'KeyState': 'CREATE_COMPLETE'} )
+        enum_spec = ('list_keys', 'Keys[]', {'KeyState': 'CREATE_COMPLETE'})
         cfn_type = "AWS::PaymentCryptography::Key"
         arn = id = name = "KeyArn"
         permission_prefix = 'payment-cryptography'
