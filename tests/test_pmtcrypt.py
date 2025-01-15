@@ -31,9 +31,9 @@ class PmtcryptTest(BaseTest):
         )
         p = self.load_policy(
             {
-                "name": "untag-payment-cryptography",
+                "name": "remove-tag-payment-cryptography",
                 "resource": "payment-cryptography",
-                "actions": [{"type": "untag", "tags": ["ResourceOwner"]}],
+                "actions": [{"type": "remove-tag", "tags": ["ResourceOwner"]}],
             },
             session_factory=session_factory,
         )
