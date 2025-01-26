@@ -1155,3 +1155,68 @@ class TestApiGatewayV2Api(BaseTest):
         self.assertEqual(len(resources), 1)
         tags = client.get_tags(ResourceArn=p.resource_manager.get_arns(resources)[0])
         assert 'custodian_cleanup' in tags['Tags']
+        
+    def test_apigwv2_update(self):
+        session_factory = self.replay_flight_data('test_apigwv2_api_update')
+        client = session_factory().client("apigatewayv2")
+        p = self.load_policy(
+            {
+                'name': 'update-http-api',
+                'resource': 'apigwv2',
+                'filters': [
+                    {'Name': 'c7n-test'}
+                ],
+                "actions": [
+                    {
+                        'type': 'update',
+                        'CorsConfiguration': {
+                            'AllowCredentials': False,
+                            'MaxAge': 60,
+                        },
+                        'Description': 'updated description',
+                        "DisableExecuteApiEndpoint": False,
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'c7n-test')
+        
+        api = client.get_api(ApiId=resources[0]['ApiId'])
+        self.assertEqual(api['CorsConfiguration'], {
+            'AllowCredentials': False,
+            'MaxAge': 60,
+        })
+        self.assertEqual(api['Description'], 'updated description')
+        self.assertFalse(api['DisableExecuteApiEndpoint'])
+
+class TestApiGatewayV2Stage(BaseTest):
+    def test_apigwv2_stage_update(self):
+        session_factory = self.record_flight_data('test_apigwv2_stage_update')
+        client = session_factory().client("apigatewayv2")
+        p = self.load_policy(
+            {
+                'name': 'update-api-stage',
+                'resource': 'apigwv2-stage',
+                "actions": [
+                    {
+                        'type': 'update',
+                        "AutoDeploy": False,
+                        "Description": "new description",
+                        'DefaultRouteSettings': {
+                            'DetailedMetricsEnabled': False,
+                        },
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        
+        stage = client.get_stage(ApiId='jp020k3s47', StageName=resources[0]['StageName'])
+        self.assertEqual(stage['DefaultRouteSettings'], {
+            'DetailedMetricsEnabled': False,
+        })
+        self.assertEqual(stage['Description'], 'new description')
+        self.assertFalse(stage['AutoDeploy'])

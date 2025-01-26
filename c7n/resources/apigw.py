@@ -17,6 +17,7 @@ from c7n.filters.policystatement import HasStatementFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
+from c7n.schema import ExpandedSchemaMeta
 from c7n.utils import generate_arn, type_schema, get_retry, jmespath_search, get_partition
 
 
@@ -1197,6 +1198,48 @@ class ApiGwV2(query.QueryResourceManager):
             )
 
         return self._generate_arn
+    
+    
+@ApiGwV2.action_registry.register('update')
+class UpdateApiV2(BaseAction, metaclass=ExpandedSchemaMeta):
+    """Update configuration of a WebSocket or HTTP API.
+    
+    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/apigatewayv2/client/update_api.html
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: apigw-update
+           resource: apigwv2
+           filters:
+             - description: empty
+           actions:
+             - type: update
+               CorsConfiguration:
+                 AllowCredentials: False
+                 MaxAge: 60
+               Descrption: My APIv2
+               DisableExecuteApiEndpoint: False
+    """
+    
+    permissions = ('apigateway:PATCH',)
+    schema = utils.type_schema('update')
+    resource_id_key = 'ApiId'
+    service = 'apigatewayv2'
+    shape_name = 'UpdateApiRequest'
+
+    def process(self, resources):
+        client = utils.local_session(
+            self.manager.session_factory).client('apigatewayv2')
+        params = dict(self.data)
+        params.pop('type')
+        for r in resources:
+            self.manager.retry(client.update_api,
+                ApiId=r['ApiId'],
+                **params
+            )
 
 
 class StageDescribe(query.ChildDescribeSource):
@@ -1234,3 +1277,45 @@ class ApiGatewayV2Stage(query.ChildResourceManager):
                 partition, self.config.region, r['c7n:parent-id'], r['StageName']
             )
             for r in resources]
+
+
+@ApiGatewayV2Stage.action_registry.register('update')
+class UpdateApiV2Stage(BaseAction, metaclass=ExpandedSchemaMeta):
+    """Update configuration of a WebSocket or HTTP API stage.
+    
+    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/apigatewayv2/client/update_stage.html
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: apigw-stage-update
+           resource: apigwv2-stage
+           filters:
+             - description: empty
+           actions:
+             - type: update
+               AutoDeploy: True
+               Descrption: My APIv2
+               DefaultRouteSettings:
+                 DetailedMetricsEnabled: True
+    """
+    
+    permissions = ('apigateway:PATCH',)
+    schema = utils.type_schema('update')
+    resource_id_key = 'ApiId'
+    service = 'apigatewayv2'
+    shape_name = 'UpdateStageRequest'
+
+    def process(self, resources):
+        client = utils.local_session(
+            self.manager.session_factory).client('apigatewayv2')
+        params = dict(self.data)
+        params.pop('type')
+        for r in resources:
+            self.manager.retry(client.update_stage,
+                ApiId=r['c7n:parent-id'],
+                StageName=r['StageName'],
+                **params
+            )
