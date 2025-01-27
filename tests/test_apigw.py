@@ -1189,7 +1189,7 @@ class TestApiGatewayV2Api(BaseTest):
         self.assertEqual(len(resources), 1)
         tags = client.get_tags(ResourceArn=p.resource_manager.get_arns(resources)[0])
         assert 'custodian_cleanup' in tags['Tags']
-        
+
     def test_apigwv2_update(self):
         session_factory = self.replay_flight_data('test_apigwv2_api_update')
         client = session_factory().client("apigatewayv2")
@@ -1216,7 +1216,7 @@ class TestApiGatewayV2Api(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['Name'], 'c7n-test')
-        
+
         api = client.get_api(ApiId=resources[0]['ApiId'])
         self.assertEqual(api['CorsConfiguration'], {
             'AllowCredentials': False,
@@ -1225,9 +1225,33 @@ class TestApiGatewayV2Api(BaseTest):
         self.assertEqual(api['Description'], 'updated description')
         self.assertFalse(api['DisableExecuteApiEndpoint'])
 
+    def test_apigwv2_delete(self):
+        session_factory = self.replay_flight_data('test_apigwv2_api_delete')
+        client = session_factory().client("apigatewayv2")
+        p = self.load_policy(
+            {
+                'name': 'delete-http-api',
+                'resource': 'apigwv2',
+                'filters': [
+                    {'Name': 'c7n-test'}
+                ],
+                "actions": [
+                    {
+                        'type': 'delete',
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        with self.assertRaises(ClientError) as e:
+            client.get_api(ApiId=resources[0]['ApiId'])
+        self.assertEqual(e.exception.response['Error']['Code'], 'NotFoundException')
+
+
 class TestApiGatewayV2Stage(BaseTest):
     def test_apigwv2_stage_update(self):
-        session_factory = self.record_flight_data('test_apigwv2_stage_update')
+        session_factory = self.replay_flight_data('test_apigwv2_stage_update')
         client = session_factory().client("apigatewayv2")
         p = self.load_policy(
             {
@@ -1247,10 +1271,43 @@ class TestApiGatewayV2Stage(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        
-        stage = client.get_stage(ApiId='jp020k3s47', StageName=resources[0]['StageName'])
+
+        stage = client.get_stage(
+            ApiId=resources[0]['c7n:parent-id'],
+            StageName=resources[0]['StageName']
+        )
         self.assertEqual(stage['DefaultRouteSettings'], {
             'DetailedMetricsEnabled': False,
         })
         self.assertEqual(stage['Description'], 'new description')
         self.assertFalse(stage['AutoDeploy'])
+
+    def test_apigwv2_stage_delete(self):
+        session_factory = self.replay_flight_data('test_apigwv2_stage_delete')
+        client = session_factory().client("apigatewayv2")
+        p = self.load_policy(
+            {
+                'name': 'delete-api-stage',
+                'resource': 'apigwv2-stage',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'StageName',
+                        'value': 'c7n-test'
+                    }
+                ],
+                "actions": [
+                    {
+                        'type': 'delete',
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        with self.assertRaises(ClientError) as e:
+            client.get_stage(
+                ApiId=resources[0]['c7n:parent-id'],
+                StageName=resources[0]['StageName']
+            )
+        self.assertEqual(e.exception.response['Error']['Code'], 'NotFoundException')

@@ -33,6 +33,35 @@
                 "StageName": "$default",
                 "StageVariables": {},
                 "Tags": {}
+            },
+            {
+                "CreatedDate": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 27,
+                    "hour": 19,
+                    "minute": 14,
+                    "second": 35,
+                    "microsecond": 0
+                },
+                "DefaultRouteSettings": {
+                    "DetailedMetricsEnabled": false
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 27,
+                    "hour": 19,
+                    "minute": 14,
+                    "second": 35,
+                    "microsecond": 0
+                },
+                "RouteSettings": {},
+                "StageName": "c7n-test",
+                "StageVariables": {},
+                "Tags": {}
             }
         ]
     }
