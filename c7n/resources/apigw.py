@@ -1220,7 +1220,7 @@ class UpdateApiV2(BaseAction, metaclass=ExpandedSchemaMeta):
                CorsConfiguration:
                  AllowCredentials: False
                  MaxAge: 60
-               Descrption: My APIv2
+               Description: My APIv2
                DisableExecuteApiEndpoint: False
     """
 
