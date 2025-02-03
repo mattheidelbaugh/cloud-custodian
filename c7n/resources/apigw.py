@@ -1324,7 +1324,7 @@ class UpdateApiV2Stage(BaseAction, metaclass=ExpandedSchemaMeta):
            actions:
              - type: update
                AutoDeploy: True
-               Descrption: My APIv2
+               Description: My APIv2
                DefaultRouteSettings:
                  DetailedMetricsEnabled: True
     """
