@@ -74,7 +74,6 @@ class PmtcryptKeyDelete(BaseAction):
                     - delete
     """
 
-    batch_size = 1
     schema = type_schema('delete')
     permissions = ('payment-cryptography:DeleteKey',)
 
