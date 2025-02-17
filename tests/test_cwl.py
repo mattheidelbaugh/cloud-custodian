@@ -496,7 +496,7 @@ class LogGroupTest(BaseTest):
 class DestinationTest(BaseTest):
 
     def test_destination(self):
-        factory = self.record_flight_data('test_destination')
+        factory = self.replay_flight_data('test_destination')
         client = local_session(factory).client('logs')
         p = self.load_policy(
             {
@@ -541,7 +541,7 @@ class DestinationTest(BaseTest):
         assert 'test-tag' not in tags
 
     def test_log_destination_cross_account(self):
-        factory = self.record_flight_data('test_destination_cross_account')
+        factory = self.replay_flight_data('test_destination_cross_account')
         p = self.load_policy(
             {
                 'name': 'cross-account-destination',
@@ -555,12 +555,12 @@ class DestinationTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_log_destination_delete(self):
-        factory = self.record_flight_data('test_destination_delete')
+        factory = self.replay_flight_data('test_destination_delete')
         client = local_session(factory).client('logs')
         p = self.load_policy(
             {
-                'name': 'log-destination-delete',
-                'resource': 'log-destination',
+                'name': 'destination-delete',
+                'resource': 'destination',
                 'filters': [{
                     'type': 'value',
                     'key': 'destinationName',
@@ -571,11 +571,9 @@ class DestinationTest(BaseTest):
         session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertRaises(
-            client.exceptions.ResourceNotFoundException,
-            client.describe_destinations,
-            destinationNamePrefix='test-destination'
-        )
+        destinations = client.describe_destinations(
+            DestinationNamePrefix='test-destination')['destinations']
+        self.assertEqual(len(destinations), 0)
 
 
 class DeliveryDestinationTest(BaseTest):

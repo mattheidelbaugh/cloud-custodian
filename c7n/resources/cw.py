@@ -1182,13 +1182,13 @@ class Destination(QueryResourceManager):
         enum_spec = ('describe_destinations', 'destinations', None)
         id = name = "destinationName"
         universal_taggable = object()
-    
+
     retry = staticmethod(get_retry(('ServiceUnavailableException', 'OperationAbortedException')))
 
     source_mapping = {
        "describe": DescribeWithResourceTags,
     }
-    
+
 
 @Destination.filter_registry.register('cross-account')
 class DestinationCrossAccount(CrossAccountAccessFilter):
@@ -1219,7 +1219,11 @@ class DestinationDelete(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('logs')
         for r in resources:
-            self.manager.retry(client.delete_destination, ignore_err_codes=('ResourceNotFoundException',), destinationName=r['destinationName'],)
+            self.manager.retry(
+                client.delete_destination,
+                ignore_err_codes=('ResourceNotFoundException',),
+                destinationName=r['destinationName'],
+            )
 
 
 @resources.register("delivery-destination")
@@ -1234,7 +1238,9 @@ class DeliveryDestination(QueryResourceManager):
         cfn_type = "AWS::Logs::DeliveryDestination"
         universal_taggable = object()
 
-    retry = staticmethod(get_retry(('ConflictException', 'ServiceUnavailableException', 'ThrottlingException',)))
+    retry = staticmethod(get_retry(
+        ('ConflictException', 'ServiceUnavailableException', 'ThrottlingException',)
+    ))
     source_mapping = {
        "describe": DescribeWithResourceTags,
     }
@@ -1284,4 +1290,8 @@ class DeliveryDestinationDelete(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('logs')
         for r in resources:
-            self.manager.retry(client.delete_delivery_destination, ignore_err_codes=('ResourceNotFoundException',), name=r['name'],)
+            self.manager.retry(
+                client.delete_delivery_destination,
+                ignore_err_codes=('ResourceNotFoundException',),
+                name=r['name'],
+            )
