@@ -1193,6 +1193,7 @@ class Destination(QueryResourceManager):
 @Destination.filter_registry.register('cross-account')
 class DestinationCrossAccount(CrossAccountAccessFilter):
 
+    permissions = ('logs:DescribeDestinations',)
     policy_attribute = 'accessPolicy'
 
 
