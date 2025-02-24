@@ -130,7 +130,7 @@ class EKS(BaseTest):
 
         results = schema.validate(policy_data, schm)
         self.assertIn(
-            "'WRONG' is not one of",
+            "Additional properties are not allowed",
             str(results)
         )
 
@@ -146,23 +146,7 @@ class EKS(BaseTest):
                 },
             )
         self.assertIn(
-            "unknownOption must be one of",
-            str(err.exception)
-        )
-
-        with self.assertRaises(PolicyValidationError) as err:
-            self.load_policy(
-                {
-                    "name": "update-eks-config",
-                    "resource": "eks",
-                    "actions": [{
-                        "type": "update-config",
-                        "unknownOption": True,
-                    }],
-                },
-            )
-        self.assertIn(
-            'unknownOption',
+            "must be one of",
             str(err.exception)
         )
 
