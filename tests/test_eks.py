@@ -134,6 +134,7 @@ class EKS(BaseTest):
             str(results)
         )
 
+        # test custom validate function
         with self.assertRaises(PolicyValidationError) as err:
             self.load_policy(
                 {
@@ -146,7 +147,7 @@ class EKS(BaseTest):
                 },
             )
         self.assertIn(
-            "must be one of",
+            "unknownOption",
             str(err.exception)
         )
 
