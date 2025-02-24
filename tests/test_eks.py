@@ -102,21 +102,51 @@ class EKS(BaseTest):
             str(results)
         )
 
+        policy_data = {"policies": [{
+            "name": "update-eks-config",
+            "resource": "eks",
+            "actions": [{
+                "type": "update-config",
+                "upgradePolicy": {
+                    "supportType": "WRONG",
+                }
+            }],
+        }]}
+
+        results = schema.validate(policy_data, schm)
+        self.assertIn(
+            "'WRONG' is not one of",
+            str(results)
+        )
+
+        policy_data = {"policies": [{
+            "name": "update-eks-config",
+            "resource": "eks",
+            "actions": [{
+                "type": "update-config",
+                "unknownOption": True,
+            }],
+        }]}
+
+        results = schema.validate(policy_data, schm)
+        self.assertIn(
+            "'WRONG' is not one of",
+            str(results)
+        )
+
         with self.assertRaises(PolicyValidationError) as err:
             self.load_policy(
                 {
                     "name": "update-eks-config",
                     "resource": "eks",
                     "actions": [{
-                            "type": "update-config",
-                            "upgradePolicy": {
-                                "supportType": 123,
-                            }
+                        "type": "update-config",
+                        "unknownOption": True,
                     }],
                 },
             )
         self.assertIn(
-            "supportType",
+            "unknownOption must be one of",
             str(err.exception)
         )
 
@@ -126,13 +156,13 @@ class EKS(BaseTest):
                     "name": "update-eks-config",
                     "resource": "eks",
                     "actions": [{
-                            "type": "update-config",
-                            "UnknownOption": True,
+                        "type": "update-config",
+                        "unknownOption": True,
                     }],
                 },
             )
         self.assertIn(
-            'UnknownOption',
+            'unknownOption',
             str(err.exception)
         )
 
