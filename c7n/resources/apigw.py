@@ -1226,7 +1226,7 @@ class UpdateApiV2(BaseAction):
 
     permissions = ('apigateway:PATCH',)
     schema = utils.type_schema(
-        'update', 
+        'update',
         **shape_schema('apigatewayv2', 'UpdateApiRequest', drop_fields=('ApiId'))
     )
 
@@ -1266,7 +1266,11 @@ class DeleteApiV2(BaseAction):
         client = utils.local_session(
             self.manager.session_factory).client('apigatewayv2')
         for r in resources:
-            self.manager.retry(client.delete_api, ApiId=r['ApiId'])
+            self.manager.retry(
+                client.delete_api,
+                ignore_err_codes=('NotFoundException',),
+                ApiId=r['ApiId']
+            )
 
 
 class StageDescribe(query.ChildDescribeSource):
@@ -1331,7 +1335,7 @@ class UpdateApiV2Stage(BaseAction):
 
     permissions = ('apigateway:PATCH',)
     schema = utils.type_schema(
-        'update', 
+        'update',
         **shape_schema('apigatewayv2', 'UpdateStageRequest', drop_fields=('ApiId', 'StageName'))
     )
 
@@ -1374,6 +1378,7 @@ class DeleteApiV2Stage(BaseAction):
         for r in resources:
             self.manager.retry(
                 client.delete_stage,
+                ignore_err_codes=('NotFoundException',),
                 ApiId=r['c7n:parent-id'],
                 StageName=r['StageName']
             )
