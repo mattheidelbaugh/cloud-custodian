@@ -876,7 +876,7 @@ def get_service_region_map(regions, resource_types, provider='aws'):
     return service_region_map, resource_service_map
 
 
-def shape_schema(service, shape_name, drop_fields=[]):
+def shape_schema(service, shape_name, drop_fields=()):
     """Expand a shape's schema using service model shape data
 
         Repurpose some of the shape discovery/validation logic in
@@ -889,16 +889,19 @@ def shape_schema(service, shape_name, drop_fields=[]):
         Args:
             service (str): The AWS service for the element. (required)
             shape_name (str): The service model request shape name. (required)
-            drop_fields (List[str]): List of fields to drop from the schema
+            drop_fields (Tuple[str]): List of fields to drop from the schema
                 (e.g. resource_id param).
      """
 
+    # Mapping of service model shape types to json schema types
     TYPE_MAP = {
         'string': 'string',
         'structure': 'object',
         'list': 'array',
         'integer': 'integer',
         'boolean': 'boolean',
+        'long': 'number',
+        'double': 'number',
     }
 
     def _expand_shape_schema(shape):
@@ -906,7 +909,9 @@ def shape_schema(service, shape_name, drop_fields=[]):
         for member, member_shape in shape.members.items():
             if member in drop_fields:
                 continue
-            member_schema = {'type': TYPE_MAP.get(member_shape.type_name)}
+            if _type := TYPE_MAP.get(member_shape.type_name) is None:
+                raise ValueError(f"Unknown type: {member_shape.type_name}")
+            member_schema = {'type': _type}
             if enum := getattr(member_shape, 'enum', None):
                 member_schema['enum'] = enum
             if member_shape.type_name == 'structure':
@@ -929,3 +934,4 @@ def shape_schema(service, shape_name, drop_fields=[]):
     shape = model.shape_for(shape_name)
 
     return _expand_shape_schema(shape)
+

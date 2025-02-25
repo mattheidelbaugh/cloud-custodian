@@ -174,7 +174,7 @@ class UpdateConfig(Action):
 
     schema = type_schema('update-config',
                 **shape_schema(
-                    'eks', 'UpdateClusterConfigRequest', drop_fields=['name'])
+                    'eks', 'UpdateClusterConfigRequest', drop_fields=('name'))
             )
 
     permissions = ('eks:UpdateClusterConfig',)
