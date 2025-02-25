@@ -16,8 +16,8 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.policystatement import HasStatementFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources, ResourceManager
+from c7n.resources.aws import shape_schema
 from c7n import query, utils
-from c7n.schema import ExpandedSchemaMeta
 from c7n.utils import generate_arn, type_schema, get_retry, jmespath_search, get_partition
 
 
@@ -1201,7 +1201,7 @@ class ApiGwV2(query.QueryResourceManager):
 
 
 @ApiGwV2.action_registry.register('update')
-class UpdateApiV2(BaseAction, metaclass=ExpandedSchemaMeta):
+class UpdateApiV2(BaseAction):
     """Update configuration of a WebSocket or HTTP API.
 
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/apigatewayv2/client/update_api.html
@@ -1225,10 +1225,10 @@ class UpdateApiV2(BaseAction, metaclass=ExpandedSchemaMeta):
     """
 
     permissions = ('apigateway:PATCH',)
-    schema = utils.type_schema('update')
-    resource_id_key = 'ApiId'
-    service = 'apigatewayv2'
-    shape_name = 'UpdateApiRequest'
+    schema = utils.type_schema(
+        'update', 
+        **shape_schema('apigatewayv2', 'UpdateApiRequest', drop_fields=('ApiId'))
+    )
 
     def process(self, resources):
         client = utils.local_session(
@@ -1307,7 +1307,7 @@ class ApiGatewayV2Stage(query.ChildResourceManager):
 
 
 @ApiGatewayV2Stage.action_registry.register('update')
-class UpdateApiV2Stage(BaseAction, metaclass=ExpandedSchemaMeta):
+class UpdateApiV2Stage(BaseAction):
     """Update configuration of a WebSocket or HTTP API stage.
 
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/apigatewayv2/client/update_stage.html
@@ -1330,10 +1330,10 @@ class UpdateApiV2Stage(BaseAction, metaclass=ExpandedSchemaMeta):
     """
 
     permissions = ('apigateway:PATCH',)
-    schema = utils.type_schema('update')
-    resource_id_key = 'ApiId'
-    service = 'apigatewayv2'
-    shape_name = 'UpdateStageRequest'
+    schema = utils.type_schema(
+        'update', 
+        **shape_schema('apigatewayv2', 'UpdateStageRequest', drop_fields=('ApiId', 'StageName'))
+    )
 
     def process(self, resources):
         client = utils.local_session(
