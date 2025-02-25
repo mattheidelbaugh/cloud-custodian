@@ -893,6 +893,7 @@ def shape_schema(service, shape_name, drop_fields=()):
                 (e.g. resource_id param).
      """
 
+    # Mapping of service model shape types to json schema types
     TYPE_MAP = {
         'string': 'string',
         'structure': 'object',
