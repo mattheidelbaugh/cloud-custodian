@@ -889,7 +889,7 @@ def shape_schema(service, shape_name, drop_fields=[]):
         Args:
             service (str): The AWS service for the element. (required)
             shape_name (str): The service model request shape name. (required)
-            drop_fields (list[str]): List of fields to drop from the schema
+            drop_fields (List[str]): List of fields to drop from the schema
                 (e.g. resource_id param).
      """
 
