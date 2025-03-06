@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "DataCatalogsSummary": [
+            {
+                "CatalogName": "AwsDataCatalog",
+                "Type": "GLUE",
+                "Status": "CREATE_COMPLETE"
+            },
+            {
+                "CatalogName": "c7n-test",
+                "Type": "GLUE",
+                "Status": "CREATE_COMPLETE"
+            },
+            {
+                "CatalogName": "sbx-u01c8m-athena-data-catalog-compliant",
+                "Type": "GLUE",
+                "Status": "CREATE_COMPLETE"
+            },
+            {
+                "CatalogName": "sbx-u01c8m-athena-data-catalog-noncompliant",
+                "Type": "GLUE",
+                "Status": "CREATE_COMPLETE"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
