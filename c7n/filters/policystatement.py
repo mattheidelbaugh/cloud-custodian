@@ -128,7 +128,9 @@ class HasStatementFilter(Filter):
             for resource_statement in resource_stmts:
                 found = 0
                 for req_key, req_value in required_statement.items():
-                    if req_key in ['Action', 'NotAction']:
+                    if req_key in ['Action', 'NotAction'] and \
+                        req_key in resource_statement:
+
                         resource_statement[req_key] = \
                             self.action_resource_case_insensitive(
                                 resource_statement[req_key])
@@ -140,13 +142,16 @@ class HasStatementFilter(Filter):
                                                         req_value,
                                                         resource_statement):
                             found += 1
-                    else:
-                        if (req_key in resource_statement) and \
-                            (req_value == resource_statement[req_key]):
-                            found += 1
+
+                    # If req_key is not a partial_match element,
+                    # do a regular full value match for a given req_key
+                    elif req_value == resource_statement.get(req_key):
+                        found += 1
+
                 if found and found == len(required_statement):
                     matched_statements.append(required_statement)
                     break
+
         return matched_statements
 
     def __match_partial_statement(self, partial_match_key,
