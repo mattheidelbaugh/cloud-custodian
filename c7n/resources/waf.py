@@ -9,22 +9,12 @@ from c7n.utils import type_schema, local_session
 
 class DescribeRegionalWaf(DescribeSource):
 
-    def get_permissions(self):
-        perms = super().get_permissions()
-        perms.remove('waf-regional:GetWebAcl')
-        return perms
-
     def augment(self, resources):
         resources = super().augment(resources)
         return universal_augment(self.manager, resources)
 
 
 class DescribeWafV2(DescribeSource):
-
-    def get_permissions(self):
-        perms = super().get_permissions()
-        perms.remove('wafv2:GetWebAcl')
-        return perms
 
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client(
@@ -78,14 +68,6 @@ class DescribeWafV2(DescribeSource):
         ]
 
 
-class DescribeWaf(DescribeSource):
-
-    def get_permissions(self):
-        perms = super().get_permissions()
-        perms.remove('waf:GetWebAcl')
-        return perms
-
-
 @resources.register('waf')
 class WAF(QueryResourceManager):
 
@@ -104,7 +86,7 @@ class WAF(QueryResourceManager):
         global_resource = True
 
     source_mapping = {
-        'describe': DescribeWaf,
+        'describe': DescribeSource,
         'config': ConfigSource
     }
 

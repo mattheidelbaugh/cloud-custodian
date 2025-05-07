@@ -244,12 +244,12 @@ class DescribeSource:
             perms = ['%s:%s' % (prefix, _napi(m.enum_spec[0]))]
         if m.universal_taggable is not False:
             perms.append("tag:GetResources")
+
         if m.permissions_augment:
             perms.extend(m.permissions_augment)
-
-        if getattr(m, 'detail_spec', None):
+        elif getattr(m, 'detail_spec', None):
             perms.append("%s:%s" % (prefix, _napi(m.detail_spec[0])))
-        if getattr(m, 'batch_detail_spec', None):
+        elif getattr(m, 'batch_detail_spec', None):
             perms.append("%s:%s" % (prefix, _napi(m.batch_detail_spec[0])))
         return perms
 

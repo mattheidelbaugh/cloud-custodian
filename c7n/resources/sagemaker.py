@@ -177,11 +177,6 @@ class SagemakerHyperParameterTuningJob(QueryResourceManager):
 
 class SagemakerAutoMLDescribeV2(DescribeSource):
 
-    def get_permissions(self):
-        perms = super().get_permissions()
-        perms.remove('sagemaker:DescribeAutoMlJobV2')
-        return perms
-
     def augment(self, resources):
         return universal_augment(self.manager, super().augment(resources))
 
