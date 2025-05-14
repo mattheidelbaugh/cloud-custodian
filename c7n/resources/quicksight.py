@@ -82,7 +82,9 @@ class QuicksightAccount(ResourceManager):
         return self.resource_type
 
     def _get_account(self):
-        client = local_session(self.session_factory).client('quicksight')
+        identity_region = self._get_identity_region()
+        client = local_session(self.session_factory).client(
+            'quicksight', region_name=identity_region)
         try:
             account = self.retry(client.describe_account_settings,
                 AwsAccountId=self.config.account_id
@@ -95,6 +97,13 @@ class QuicksightAccount(ResourceManager):
         account.pop('ResponseMetadata', None)
         account['account_id'] = 'quicksight-settings'
         return [account]
+
+    def _get_identity_region(self):
+        client = local_session(self.session_factory).client('quicksight')
+        namespaces = client.list_namespaces(AwsAccountId=self.config.account_id)["Namespaces"]
+        for n in namespaces:
+            if n["Name"] == "default":
+                return n["CapacityRegion"]
 
     def resources(self):
         return self.filter_resources(self._get_account())

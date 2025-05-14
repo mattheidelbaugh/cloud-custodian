@@ -23,7 +23,7 @@ def test_quicksight_group_query(test, quicksight_group):
 class TestQuicksight(BaseTest):
 
     def test_quicksight_account_query(self):
-        factory = self.replay_flight_data("test_quicksight_account_query")
+        factory = self.record_flight_data("test_quicksight_account_query")
 
         policy = self.load_policy({
             "name": "test-aws-quicksight-account",
@@ -35,7 +35,7 @@ class TestQuicksight(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_quicksight_account_get_account_not_found(self):
-        factory = self.replay_flight_data("test_quicksight_account_not_found")
+        factory = self.record_flight_data("test_quicksight_account_not_found")
 
         policy = self.load_policy({
             "name": "test-aws-quicksight-account",
@@ -44,3 +44,14 @@ class TestQuicksight(BaseTest):
 
         resources = policy.run()
         self.assertEqual(resources, [])
+
+    def test_quicksight_account_from_non_identity_region(self):
+        factory = self.record_flight_data("test_quicksight_account_from_non_identity_region")
+
+        policy = self.load_policy({
+            "name": "test-aws-quicksight-account",
+            "resource": "aws.quicksight-account"
+        }, session_factory=factory, config={'region': 'us-west-2'})
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
