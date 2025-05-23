@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Status": 200,
+        "AccountSettings": {
+            "Edition": "ENTERPRISE",
+            "DefaultNamespace": "default",
+            "NotificationEmail": "matthew.heidelbaugh@capitalone.com",
+            "PublicSharingEnabled": false,
+            "TerminationProtectionEnabled": true
+        },
+        "RequestId": "5cce8a2d-fc9e-485d-a780-7fe34c86c023"
+    }
+}

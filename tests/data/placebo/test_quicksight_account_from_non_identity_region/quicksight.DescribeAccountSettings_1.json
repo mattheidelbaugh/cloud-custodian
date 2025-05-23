@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Status": 200,
+        "AccountSettings": {
+            "AccountName": "custodian-skunk-works",
+            "Edition": "ENTERPRISE",
+            "DefaultNamespace": "default",
+            "NotificationEmail": "matthew.heidelbaugh@capitalone.com",
+            "PublicSharingEnabled": false,
+            "TerminationProtectionEnabled": true
+        },
+        "RequestId": "3026b307-7b94-4872-95c4-bbc3ccd171c3"
+    }
+}

@@ -1,11 +1,17 @@
 {
-    "status_code": 403,
+    "status_code": 200,
     "data": {
-        "Error": {
-            "Message": "User: arn:aws:sts::644160558196:assumed-role/GR_GG_COF_AWS_NP_CoreEngineering/eah523 is not authorized to perform: quicksight:ListNamespaces on resource: arn:aws:quicksight:us-east-1:644160558196:namespace/* because no resource-based policy allows the quicksight:ListNamespaces action",
-            "Code": "AccessDeniedException"
-        },
         "ResponseMetadata": {},
-        "Message": "User: arn:aws:sts::644160558196:assumed-role/GR_GG_COF_AWS_NP_CoreEngineering/eah523 is not authorized to perform: quicksight:ListNamespaces on resource: arn:aws:quicksight:us-east-1:644160558196:namespace/* because no resource-based policy allows the quicksight:ListNamespaces action"
+        "Status": 200,
+        "Namespaces": [
+            {
+                "Name": "default",
+                "Arn": "arn:aws:quicksight:us-east-1:644160558196:namespace/default",
+                "CapacityRegion": "us-east-1",
+                "CreationStatus": "CREATED",
+                "IdentityStore": "QUICKSIGHT"
+            }
+        ],
+        "RequestId": "cabe2e9f-82fb-42d7-ab92-e2f3d5c72132"
     }
 }
