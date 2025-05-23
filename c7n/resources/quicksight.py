@@ -72,7 +72,7 @@ class QuicksightAccount(ResourceManager):
         # this resource is not query manager based as its a pseudo
         # resource. in that it always exists, it represents the
         # service's account settings.
-        return ('quicksight:DescribeAccountSettings',)
+        return ('quicksight:DescribeAccountSettings', 'quicksight:ListNamespaces')
 
     @classmethod
     def has_arn(self):
@@ -90,7 +90,10 @@ class QuicksightAccount(ResourceManager):
                 AwsAccountId=self.config.account_id
             )["AccountSettings"]
         except ClientError as e:
-            if e.response['Error']['Code'] in ('ResourceNotFoundException',):
+            if e.response['Error']['Code'] in ('ResourceNotFoundException',) or (
+                e.response['Error']['Code'] in ('AccessDeniedException',) and
+                "disabled for STANDARD Edition" in e.response['Error']['Message']
+            ):
                 return []
             raise
 
@@ -100,6 +103,7 @@ class QuicksightAccount(ResourceManager):
 
     def _get_identity_region(self):
         client = local_session(self.session_factory).client('quicksight')
+        # doesn't seem to be clean, direct way to get this, so inferring it from namespaces
         namespaces = client.list_namespaces(AwsAccountId=self.config.account_id)["Namespaces"]
         for n in namespaces:
             if n["Name"] == "default":
