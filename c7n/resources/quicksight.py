@@ -82,17 +82,25 @@ class QuicksightAccount(ResourceManager):
         return self.resource_type
 
     def _get_account(self):
-        identity_region = self._get_identity_region()
-        client = local_session(self.session_factory).client(
-            'quicksight', region_name=identity_region)
+        client = local_session(self.session_factory).client('quicksight')
         try:
             account = self.retry(client.describe_account_settings,
                 AwsAccountId=self.config.account_id
             )["AccountSettings"]
         except ClientError as e:
-            if e.response['Error']['Code'] in ('ResourceNotFoundException',) or (
-                e.response['Error']['Code'] in ('AccessDeniedException',) and
-                "disabled for STANDARD Edition" in e.response['Error']['Message']
+            # Return no resources if no quicksight account has been created, the standard edition is
+            # being used, or if the policy is being run from a non-identity region. Otherwise, raise
+            # the exception. It's a bit brittle to depend on error messages, but unfortunately
+            # these all are lumped under AccessDenied, and we would like normal AccessDenied
+            # Exceptions caused by lack of IAM permissions to still be raised.
+            error_code = e.response['Error']['Code']
+            error_message = e.response['Error'].get('Message', '')
+
+            if error_code == 'ResourceNotFoundException' or (
+                error_code == 'AccessDeniedException' and (
+                    "disabled for STANDARD Edition" in error_message or
+                    "Operation is being called from endpoint" in error_message
+                )
             ):
                 return []
             raise
@@ -100,14 +108,6 @@ class QuicksightAccount(ResourceManager):
         account.pop('ResponseMetadata', None)
         account['account_id'] = 'quicksight-settings'
         return [account]
-
-    def _get_identity_region(self):
-        client = local_session(self.session_factory).client('quicksight')
-        # doesn't seem to be clean, direct way to get this, so inferring it from namespaces
-        namespaces = client.list_namespaces(AwsAccountId=self.config.account_id)["Namespaces"]
-        for n in namespaces:
-            if n["Name"] == "default":
-                return n["CapacityRegion"]
 
     def resources(self):
         return self.filter_resources(self._get_account())
