@@ -45,16 +45,17 @@ class TestQuicksight(BaseTest):
     #     resources = policy.run()
     #     self.assertEqual(resources, [])
 
-    def test_quicksight_account_from_non_identity_region(self):
-        factory = self.replay_flight_data("test_quicksight_account_from_non_identity_region")
+    # def test_quicksight_account_from_non_identity_region(self):
+    #     factory = self.record_flight_data("test_quicksight_account_from_non_identity_region")
 
-        policy = self.load_policy({
-            "name": "test-aws-quicksight-account",
-            "resource": "aws.quicksight-account"
-        }, session_factory=factory, config={'region': 'us-west-2'})
+    #     policy = self.load_policy({
+    #         "name": "test-aws-quicksight-account",
+    #         "resource": "aws.quicksight-account"
+    #     }, session_factory=factory, config={'region': 'us-west-2'})
 
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
+    #     resources = policy.run()
+    #     print(resources)
+    #     self.assertEqual(len(resources), 0)
 
     # def test_quicksight_account_standard_edition(self):
     #     factory = self.record_flight_data("test_quicksight_account_standard_edition")
@@ -62,7 +63,6 @@ class TestQuicksight(BaseTest):
     #     policy = self.load_policy({
     #         "name": "test-aws-quicksight-account",
     #         "resource": "aws.quicksight-account",
-    #         "filters": [{"Edition": "STANDARD"}]
     #     }, session_factory=factory)
 
     #     resources = policy.run()

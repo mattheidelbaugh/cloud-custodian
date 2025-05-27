@@ -84,6 +84,7 @@ class QuicksightAccount(ResourceManager):
     def _get_account(self):
         client = local_session(self.session_factory).client('quicksight')
         try:
+            import pdb; pdb.set_trace()
             account = self.retry(client.describe_account_settings,
                 AwsAccountId=self.config.account_id
             )["AccountSettings"]
