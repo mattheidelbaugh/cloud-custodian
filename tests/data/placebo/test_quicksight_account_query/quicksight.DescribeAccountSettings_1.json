@@ -7,7 +7,7 @@
             "AccountName": "c7n-test",
             "Edition": "ENTERPRISE",
             "DefaultNamespace": "default",
-            "NotificationEmail": "matthew.heidelbaugh@capitalone.com",
+            "NotificationEmail": "test@c7n.com",
             "PublicSharingEnabled": false,
             "TerminationProtectionEnabled": true
         },

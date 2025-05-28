@@ -72,7 +72,7 @@ class QuicksightAccount(ResourceManager):
         # this resource is not query manager based as its a pseudo
         # resource. in that it always exists, it represents the
         # service's account settings.
-        return ('quicksight:DescribeAccountSettings', 'quicksight:ListNamespaces')
+        return ('quicksight:DescribeAccountSettings',)
 
     @classmethod
     def has_arn(self):
