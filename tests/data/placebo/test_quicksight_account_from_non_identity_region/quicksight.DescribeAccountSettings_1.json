@@ -1,15 +1,11 @@
 {
-    "status_code": 200,
+    "status_code": 401,
     "data": {
-        "ResponseMetadata": {},
-        "Status": 200,
-        "AccountSettings": {
-            "Edition": "ENTERPRISE",
-            "DefaultNamespace": "default",
-            "NotificationEmail": "matthew.heidelbaugh@capitalone.com",
-            "PublicSharingEnabled": false,
-            "TerminationProtectionEnabled": true
+        "Error": {
+            "Message": "Operation is being called from endpoint us-west-2, but your identity region is us-east-1. Please use the us-east-1 endpoint.",
+            "Code": "AccessDeniedException"
         },
-        "RequestId": "7ccb5f82-de79-4dbd-af41-bc98d5353b19"
+        "ResponseMetadata": {},
+        "Message": "Operation is being called from endpoint us-west-2, but your identity region is us-east-1. Please use the us-east-1 endpoint."
     }
 }
