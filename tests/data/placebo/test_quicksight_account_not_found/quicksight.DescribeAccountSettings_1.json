@@ -1,15 +1,10 @@
 {
-    "status_code": 200,
+    "status_code": 400,
     "data": {
-        "ResponseMetadata": {},
-        "Status": 200,
-        "AccountSettings": {
-            "Edition": "ENTERPRISE",
-            "DefaultNamespace": "default",
-            "NotificationEmail": "matthew.heidelbaugh@capitalone.com",
-            "PublicSharingEnabled": false,
-            "TerminationProtectionEnabled": true
+        "Error": {
+            "Message": "Quicksight Account Not Found.",
+            "Code": "ResourceNotFoundException"
         },
-        "RequestId": "053fdc02-acc8-4096-a0dd-96c92ca18505"
+        "ResponseMetadata": {}
     }
 }
