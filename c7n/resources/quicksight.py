@@ -3,7 +3,7 @@
 from botocore.exceptions import ClientError
 
 from c7n import query
-from c7n.actions import ActionRegistry
+from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry
 from c7n.manager import resources, ResourceManager
 from c7n.utils import local_session, get_retry, type_schema
@@ -35,7 +35,7 @@ class QuicksightUser(query.QueryResourceManager):
 
 
 @QuicksightUser.action_registry.register('delete')
-class DeleteUserAction(query.Action):
+class DeleteUserAction(BaseAction):
     schema = type_schema('delete',)
     permissions = ('quicksight:DeleteUser',)
 
