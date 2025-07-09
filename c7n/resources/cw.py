@@ -1,11 +1,14 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import itertools
+import re
 from collections import defaultdict
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
 import botocore.exceptions
+from botocore.config import Config
+
 from c7n import query
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
@@ -24,8 +27,6 @@ from c7n.resources.aws import ArnResolver
 from c7n.query import RetryPageIterator
 from c7n.tags import universal_augment
 from c7n.utils import type_schema, local_session, chunks, get_retry, jmespath_search
-from botocore.config import Config
-import re
 
 
 class DescribeAlarm(DescribeSource):
@@ -1262,7 +1263,7 @@ class DeliveryDestinationCrossAccount(CrossAccountAccessFilter):
                 deliveryDestinationName=r['name'],
                 ignore_err_codes=('ResourceNotFoundException',)
             )
-            r[self.policy_attribute] = resp['policy']['deliveryDestinationPolicy']
+            r[self.policy_attribute] = resp['policy'].get('deliveryDestinationPolicy', {})
         return super().process(resources)
 
 

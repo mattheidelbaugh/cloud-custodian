@@ -629,12 +629,26 @@ class DeliveryDestinationTest(BaseTest):
                 'name': 'cross-account-delivery-destination',
                 'resource': 'delivery-destination',
                 'filters': [{
-                    'type': 'cross-account'
+                    'type': 'cross-account',
                 }],
             },
         session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_log_destination_cross_account_no_policy(self):
+        factory = self.replay_flight_data('test_delivery_destination_cross_account_no_policy')
+        p = self.load_policy(
+            {
+                'name': 'cross-account-delivery-destination-no-policy',
+                'resource': 'delivery-destination',
+                'filters': [{
+                    'type': 'cross-account',
+                }],
+            },
+        session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
 
     def test_log_destination_delete(self):
         factory = self.replay_flight_data('test_delivery_destination_delete')
