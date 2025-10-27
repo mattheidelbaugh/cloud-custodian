@@ -962,6 +962,13 @@ def test_provider_parse():
         "line_start": 5,
         "line_end": 8,
         "src_dir": Path("tests") / "terraform" / "ec2_stop_protection_disabled",
+        "references": [
+            {
+                "id": ANY,
+                "label": "aws_vpc",
+                "name": "example",
+            }
+        ],
     }
 
 
@@ -1070,7 +1077,7 @@ def test_cli_execution_error(policy_env, test, debug_cli_runner):
         }
     )
 
-    runner = debug_cli_runner
+    runner = CliRunner()
     with patch.object(core.CollectionRunner, "run_policy", side_effect=KeyError("abc")):
         result = runner.invoke(
             cli.cli, ["run", "-p", policy_env.policy_dir, "-d", policy_env.policy_dir]
@@ -1103,7 +1110,7 @@ def test_cli_dump(policy_env, test, debug_cli_runner):
         }
         """
     )
-    runner = debug_cli_runner
+    runner = CliRunner()
     result = runner.invoke(
         cli.cli,
         [
@@ -1144,7 +1151,8 @@ def test_cli_var_file(tmp_path, var_tf_setup, debug_cli_runner):
             }
         )
     )
-    result = debug_cli_runner.invoke(
+    runner = CliRunner()
+    result = runner.invoke(
         cli.cli,
         [
             "run",
@@ -1200,7 +1208,8 @@ resource "google_storage_bucket" "static-site" {
 }        """
     )
 
-    result = debug_cli_runner.invoke(
+    runner = CliRunner()
+    result = runner.invoke(
         cli.cli,
         [
             "run",
@@ -1486,7 +1495,7 @@ resource "aws_cloudwatch_log_group" "yada" {
             "filters": [{"tags": "absent"}],
         }
     )
-    runner = debug_cli_runner  # CliRunner()
+    runner = CliRunner()
     result = runner.invoke(
         cli.cli,
         [
@@ -2198,7 +2207,6 @@ def test_traverse_list_members(tmp_path):
     }
 
 
-@pytest.mark.xfail(reason="https://github.com/cloud-custodian/tfparse/issues/99")
 def test_traverse_multiple_references(tmp_path):
 
     resources = run_policy(
@@ -2207,12 +2215,8 @@ def test_traverse_multiple_references(tmp_path):
             "resource": ["terraform.azurerm_storage_account"],
             "filters": [
                 {
-                    "not": [
-                        {
-                            "type": "traverse",
-                            "resources": ["azurerm_private_endpoint"],
-                        },
-                    ]
+                    "type": "traverse",
+                    "resources": ["azurerm_private_endpoint"],
                 }
             ],
         },
@@ -2222,7 +2226,6 @@ def test_traverse_multiple_references(tmp_path):
     assert len(resources) == 2
 
 
-@pytest.mark.xfail(reason="https://github.com/cloud-custodian/tfparse/issues/205")
 def test_merge_null_elements(tmp_path):
 
     resources = run_policy(
@@ -2237,4 +2240,39 @@ def test_merge_null_elements(tmp_path):
     assert len(resources) == 1
     assert {r.resource.name for r in resources} == {
         "aws_instance.untagged",
+    }
+
+
+def test_merge_locals_with_apply_time_values(tmp_path):
+
+    resources = run_policy(
+        {
+            "name": "aws-tags-using-locals",
+            "resource": ["terraform.aws_*"],
+            "filters": ["taggable", {"tag:Environment": "absent"}],
+        },
+        terraform_dir / "merge_locals_with_apply_time_values",
+        tmp_path,
+    )
+    assert len(resources) == 1
+    assert {r.resource.name for r in resources} == {
+        "aws_db_parameter_group.untagged",
+    }
+
+
+def test_attribute_value_presence(tmp_path):
+
+    resources = run_policy(
+        {
+            "name": "aws-role-permission-boundary-specified",
+            "resource": ["terraform.aws_iam_role"],
+            "filters": [{"permissions_boundary": "present"}],
+        },
+        terraform_dir / "attribute_value_presence",
+        tmp_path,
+    )
+    assert len(resources) == 2
+    assert {r.resource.name for r in resources} == {
+        "aws_iam_role.attribute_with_direct_reference",
+        "aws_iam_role.attribute_with_interpolated_reference",
     }

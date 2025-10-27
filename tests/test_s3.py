@@ -44,7 +44,7 @@ def test_s3_express(test):
         config={'account_id': '644160558196', 'region': 'us-east-1'},
         session_factory=session_factory)
     resources = p.run()
-    assert len(resources) ==  1
+    assert len(resources) == 1
     assert p.resource_manager.get_arns(resources) == [
         'arn:aws:s3express:us-east-1:644160558196:bucket/test-zone--use1-az4--x-s3'
     ]
@@ -3802,6 +3802,20 @@ class S3Test(BaseTest):
 
         resources = p.run()
         assert {bucket["Name"] for bucket in resources} == {"bucket-with-data-events"}
+
+    def test_s3_dataaccesspointaccount_cross_account(self):
+        session_factory = self.replay_flight_data("test_s3_dataaccesspointaccount_cross_account")
+
+        p = self.load_policy(
+            {
+                "name": "s3-data-access-point-account-cross-account",
+                "resource": "s3",
+                "filters": [{"type": "cross-account"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
 
 class S3LifecycleTest(BaseTest):

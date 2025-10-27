@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
+import logging
 
 from c7n.actions import BaseAction, Action
 from c7n.filters.iamaccess import CrossAccountAccessFilter
@@ -14,6 +15,8 @@ from c7n.tags import RemoveTag, Tag
 from c7n.filters import (FilterRegistry, ListItemFilter)
 
 filters = FilterRegistry('SESIngressEndpoint.filters')
+
+log = logging.getLogger("custodian.ses")
 
 
 class DescribeConfigurationSet(DescribeSource):
@@ -74,6 +77,7 @@ class SESConfigurationSetV2(QueryResourceManager):
         service = 'sesv2'
         enum_spec = ('list_configuration_sets', 'ConfigurationSets', None)
         name = id = 'ConfigurationSetName'
+        arn_service = 'ses'
         arn_type = 'configuration-set'
         universal_taggable = object()
         config_type = "AWS::SES::ConfigurationSet"
@@ -160,6 +164,7 @@ class SESEmailIdentity(QueryResourceManager):
         enum_spec = ('list_email_identities', 'EmailIdentities', None)
         detail_spec = ('get_email_identity', 'EmailIdentity', 'IdentityName', None)
         name = id = 'IdentityName'
+        arn_service = 'ses'
         arn_type = 'identity'
         universal_taggable = object()
         permission_prefix = 'ses'
@@ -347,7 +352,14 @@ class DescribeDedicatedIpPool(DescribeSource):
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client('sesv2')
         resource_list = []
+        # Default & Shared Dedicated IP pool names
+        # https://docs.aws.amazon.com/ses/latest/dg/managing-ip-pools.html
+        default_shared_pools = ["ses-default-dedicated-pool", "ses-shared-pool"]
         for r in resources:
+            if r in default_shared_pools:
+                # For default & shared pools, we cannot call get_dedicated_ip_pool
+                log.info("Skipping default/shared pool: %s", r)
+                continue
             details = client.get_dedicated_ip_pool(PoolName=r)
             resource_list.append(details["DedicatedIpPool"])
         return universal_augment(self.manager, resource_list)
@@ -359,6 +371,7 @@ class SESDedicatedIpPool(QueryResourceManager):
         service = 'sesv2'
         enum_spec = ('list_dedicated_ip_pools', 'DedicatedIpPools', None)
         name = id = 'PoolName'
+        arn_service = 'ses'
         arn_type = 'dedicated-ip-pool'
         universal_taggable = object()
         config_type = None

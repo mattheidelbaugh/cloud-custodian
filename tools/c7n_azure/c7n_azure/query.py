@@ -186,8 +186,12 @@ class TypeInfo(metaclass=TypeMeta):
     client = ''
 
     resource = DEFAULT_RESOURCE_AUTH_ENDPOINT
-    # Default id field, resources should override if different (used for meta filters, report etc)
+    # Default id and name fields, resources should override if different
+    # (used for meta filters, report etc)
     id = 'id'
+    name = 'name'
+
+    default_report_fields = ()
 
     @classmethod
     def extra_args(cls, resource_manager):
@@ -333,6 +337,43 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 class ChildResourceManager(QueryResourceManager, metaclass=QueryMeta):
     child_source = 'describe-child-azure'
     parent_manager = None
+
+    @staticmethod
+    def _extract_parent(resource):
+        """
+        Returns a parent id from a child resource.
+
+        This is a reference implementation for child resources, and may need to
+        be reimplemented on specific resource types
+        """
+        # /
+        # subscriptions
+        # /
+        # <subscription id>
+        # /
+        # resourceGroups
+        # /
+        # <resource group id>
+        # /
+        # providers
+        # /
+        # <provider id>
+        # /
+        # <parent type>
+        # /
+        # <parent id>
+        # /
+        # ...
+        return resource['id'].split('/', 9)[-2]
+
+    @staticmethod
+    def extract_parent(resource):
+        """
+        Extract the parent id out of the child resource metadata
+        """
+        if ChildTypeInfo.parent_key in resource:
+            return resource[ChildTypeInfo.parent_key]
+        return ChildResourceManager._extract_parent(resource)
 
     @property
     def source_type(self):

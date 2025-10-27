@@ -172,7 +172,7 @@ class MacieEnabled(ValueFilter):
     """Check status of macie v2 in the account.
 
     Gets the macie session info for the account, and
-    the macie master account for the current account if
+    the macie adminstrator account for the current account if
     configured.
     """
 
@@ -180,7 +180,7 @@ class MacieEnabled(ValueFilter):
     schema_alias = False
     annotation_key = 'c7n:macie'
     annotate = False
-    permissions = ('macie2:GetMacieSession', 'macie2:GetMasterAccount',)
+    permissions = ('macie2:GetMacieSession', 'macie2:GetAdministratorAccount',)
 
     def process(self, resources, event=None):
 
@@ -203,12 +203,13 @@ class MacieEnabled(ValueFilter):
             info = {}
 
         try:
-            minfo = client.get_master_account().get('master')
+            minfo = client.get_administrator_account().get('administrator')
         except (client.exceptions.AccessDeniedException,
                 client.exceptions.ResourceNotFoundException):
             info['master'] = {}
         else:
             info['master'] = minfo
+        info['administrator'] = info['master']
         account[self.annotation_key] = info
 
 
@@ -2589,3 +2590,51 @@ class SetEC2MetadataDefaults(BaseAction):
         client = local_session(self.manager.session_factory).client(self.service)
         self.data.pop('type')
         client.modify_instance_metadata_defaults(**self.data)
+
+
+@actions.register('set-security-token-service-preferences')
+class SetSecurityTokenServicePreferences(BaseAction):
+    """Action to set STS preferences."""
+
+    """Action to set STS preferences.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-sts-preferences
+                resource: account
+                filters:
+                  - or:
+                    - type: iam-summary
+                      key: GlobalEndpointTokenVersion
+                      value: absent
+                      value: optional
+                    - type: iam-summary
+                      key: GlobalEndpointTokenVersion
+                      op: ne
+                      value: 2
+                actions:
+                  - type: set-security-token-service-preferences
+                    token_version: v2Token
+
+    """
+
+    schema = type_schema(
+        'set-security-token-service-preferences',
+        token_version={'type': 'string', 'enum': ['v1Token', 'v2Token']}
+    )
+
+    permissions = ('iam:SetSecurityTokenServicePreferences',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        token_version = self.data.get('token_version', 'v2Token')
+        for resource in resources:
+            self.set_sts_preferences(client, token_version)
+
+    def set_sts_preferences(self, client, token_version):
+        client.set_security_token_service_preferences(
+            GlobalEndpointTokenVersion=token_version
+        )

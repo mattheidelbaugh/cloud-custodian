@@ -50,6 +50,7 @@ class PolicyChecker:
     checker_config:
       - check_actions: only check one of the specified actions
       - everyone_only: only check for wildcard permission grants
+      - return_allowed: if true, return the statements that are allowed
       - allowed_accounts: permission grants to these accounts are okay
       - whitelist_conditions: a list of conditions that are considered
             sufficient enough to whitelist the statement.
@@ -58,6 +59,10 @@ class PolicyChecker:
         self.checker_config = checker_config
 
     # Config properties
+    @property
+    def return_allowed(self):
+        return self.checker_config.get('return_allowed', False)
+
     @property
     def allowed_accounts(self):
         return self.checker_config.get('allowed_accounts', ())
@@ -93,11 +98,14 @@ class PolicyChecker:
         else:
             policy = policy_text
 
-        violations = []
+        allowlist_statements, violations = [], []
+
         for s in policy.get('Statement', ()):
             if self.handle_statement(s):
                 violations.append(s)
-        return violations
+            else:
+                allowlist_statements.append(s)
+        return allowlist_statements if self.return_allowed else violations
 
     def handle_statement(self, s):
         if (all((self.handle_principal(s),
@@ -192,19 +200,16 @@ class PolicyChecker:
         set_conditions = ('ForAllValues', 'ForAnyValues')
 
         for s_cond_op in list(s['Condition'].keys()):
-            cond = {'op': s_cond_op}
-
             if s_cond_op not in conditions:
                 if not any(s_cond_op.startswith(c) for c in set_conditions):
                     continue
 
-            cond['key'] = list(s['Condition'][s_cond_op].keys())[0]
-            cond['values'] = s['Condition'][s_cond_op][cond['key']]
-            cond['values'] = (
-                isinstance(cond['values'],
-                           str) and (cond['values'],) or cond['values'])
-            cond['key'] = cond['key'].lower()
-            s_cond.append(cond)
+            # Loop over all keys under each operator
+            for key, value in s['Condition'][s_cond_op].items():
+                cond = {'op': s_cond_op}
+                cond['key'] = key.lower()
+                cond['values'] = (value,) if isinstance(value, str) else value
+                s_cond.append(cond)
 
         return s_cond
 
@@ -240,6 +245,26 @@ class PolicyChecker:
             return True
         return bool(set(map(_account, c['values'])).difference(self.allowed_orgid))
 
+    def handle_aws_principalarn(self, s, c):
+        """Handle the aws:PrincipalArn condition key."""
+
+        return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
+
+    def handle_aws_resourceorgid(self, s, c):
+        """Handle the aws:resourceOrgID condition key."""
+
+        return bool(set(map(_account, c['values'])).difference(self.allowed_orgid))
+
+    def handle_aws_principalaccount(self, s, c):
+        """Handle the aws:PrincipalAccount condition key."""
+
+        return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
+
+    def handle_s3_dataaccesspointaccount(self, s, c):
+        """Handle the s3:DataAccessPointAccount condition key."""
+
+        return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
+
 
 class CrossAccountAccessFilter(Filter):
     """Check a resource's embedded iam policy for cross account access.
@@ -251,6 +276,8 @@ class CrossAccountAccessFilter(Filter):
         actions={'type': 'array', 'items': {'type': 'string'}},
         # only consider policies which grant to *
         everyone_only={'type': 'boolean'},
+        # only consider policies which grant to the specified accounts
+        return_allowed={'type': 'boolean'},
         # disregard statements using these conditions.
         whitelist_conditions={'type': 'array', 'items': {'type': 'string'}},
         # white list accounts
@@ -265,11 +292,13 @@ class CrossAccountAccessFilter(Filter):
 
     policy_attribute = 'Policy'
     annotation_key = 'CrossAccountViolations'
+    allowlist_key = 'CrossAccountAllowlists'
 
     checker_factory = PolicyChecker
 
     def process(self, resources, event=None):
         self.everyone_only = self.data.get('everyone_only', False)
+        self.return_allowed = self.data.get('return_allowed', False)
         self.conditions = set(self.data.get(
             'whitelist_conditions',
             ("aws:userid", "aws:username")))
@@ -286,7 +315,8 @@ class CrossAccountAccessFilter(Filter):
              'allowed_orgid': self.orgid,
              'check_actions': self.actions,
              'everyone_only': self.everyone_only,
-             'whitelist_conditions': self.conditions})
+             'whitelist_conditions': self.conditions,
+             'return_allowed': self.return_allowed})
         self.checker = self.checker_factory(self.checker_config)
         return super(CrossAccountAccessFilter, self).process(resources, event)
 
@@ -327,7 +357,11 @@ class CrossAccountAccessFilter(Filter):
         p = self.get_resource_policy(r)
         if p is None:
             return False
-        violations = self.checker.check(p)
-        if violations:
-            r[self.annotation_key] = violations
+        results = self.checker.check(p)
+        if self.return_allowed and results:
+            r[self.allowlist_key] = results
+            return True
+
+        if not self.return_allowed and results:
+            r[self.annotation_key] = results
             return True

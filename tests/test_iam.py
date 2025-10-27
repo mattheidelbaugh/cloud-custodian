@@ -1623,6 +1623,59 @@ def test_iam_delete_provider_oidc_action(test, iam_delete_provider_oidc):
 
 # The terraform fixture sets up resources, which happens before we
 # actually enter the test:
+@terraform('iam_delete_provider_saml', teardown=terraform.TEARDOWN_IGNORE)
+def test_iam_delete_provider_saml_action(test, iam_delete_provider_saml):
+    # The 'iam_delete_provider_saml' argument allows us to access the
+    # data in the 'tf_resources.json' file inside the
+    # 'tests/terraform/iam_delete_provider_saml' directory.  Here's how
+    # we access the IAM provider's arn using a 'dotted' notation:
+    arn = iam_delete_provider_saml['aws_iam_saml_provider.test_saml_provider.arn']
+
+    # Uncomment to following line when you're recording the first time:
+    # session_factory = test.record_flight_data('iam_delete_provider_saml')
+
+    # If you already recorded the interaction with AWS for this test,
+    # you can just replay it.  In which case, the files containing the
+    # responses from AWS are gonna be found inside the
+    # 'tests/data/placebo/iam_delete_provider_saml' directory:
+    session_factory = test.replay_flight_data('iam_delete_provider_saml')
+
+    # Set up an 'iam' boto client for the test:
+    client = session_factory().client('iam')
+
+    # Execute the 'delete' action that we want to test:
+    pdata = {
+        'name': 'delete',
+        'resource': 'iam-saml-provider',
+        'filters': [
+            {
+                'type': 'value',
+                'key': 'tag:Name',
+                'value': 'testprovider',
+            },
+        ],
+        'actions': [
+            {
+                'type': 'delete',
+            },
+        ],
+    }
+    policy = test.load_policy(pdata, session_factory=session_factory)
+    resources = policy.run()
+
+    # Here's the number of resources that the policy resolved,
+    # i.e. the resources that passed the filters:
+    assert len(resources) == 1
+    assert resources[0]['Arn'] == arn
+
+    # We're testing that our delete action worked because the iam
+    # provider now no longer exists:
+    with pytest.raises(client.exceptions.NoSuchEntityException):
+        client.get_saml_provider(SAMLProviderArn=arn)
+
+
+# The terraform fixture sets up resources, which happens before we
+# actually enter the test:
 @terraform('iam_delete_certificate', teardown=terraform.TEARDOWN_IGNORE)
 def test_iam_delete_certificate_action(test, iam_delete_certificate):
     # The 'iam_delete_certificate' argument allows us to access the
@@ -2422,6 +2475,13 @@ class CrossAccountChecker(TestCase):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
 
+    def test_s3_return_allowed_only(self):
+        policies = load_data("iam/s3-principal.json")
+        checker = PolicyChecker({"return_allowed": True})
+        for p, expected in zip(policies, [False, False, False, True, True, True]):
+            allowances = checker.check(p)
+            self.assertEqual(bool(allowances), expected)
+
     def test_s3_principal_org_id(self):
         policies = load_data("iam/s3-orgid.json")
         checker = PolicyChecker(
@@ -2430,6 +2490,75 @@ class CrossAccountChecker(TestCase):
             }
         )
         for p, expected in zip(policies, [False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_policies_multiple_keys(self):
+        policies = load_data("iam/s3-condition-multi-keys.json")
+        checker = PolicyChecker(
+            {
+                "allowed_accounts": {"123456789012"},
+                "allowed_orgid": {"o-goodorg"}
+            }
+        )
+        for p, expected in zip(policies, [False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_resource_org_id(self):
+        policies = load_data("iam/s3-resource-orgid.json")
+        checker = PolicyChecker(
+            {
+                "allowed_orgid": {"o-goodorg"}
+            }
+        )
+        for p, expected in zip(policies, [False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+        checker = PolicyChecker(
+            {
+                "allowed_orgid": {}
+            }
+        )
+        for p, expected in zip(policies, [True, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_arn_condition(self):
+        policies = load_data("iam/s3-arn-conditions.json")
+        checker = PolicyChecker(
+            {
+                "allowed_accounts": {"123456789012"}
+            }
+        )
+        for p, expected in zip(policies, [False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+        checker = PolicyChecker(
+            {
+                "allowed_accounts": {}
+            }
+        )
+        for p, expected in zip(policies, [True, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_principal_account(self):
+        policies = load_data("iam/s3-principal-accounts.json")
+        checker = PolicyChecker(
+            {
+                "allowed_accounts": {"123456789012"}
+            }
+        )
+        for p, expected in zip(policies, [False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+        checker = PolicyChecker(
+            {
+                "allowed_accounts": {}
+            }
+        )
+        for p, expected in zip(policies, [True, True]):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
 
