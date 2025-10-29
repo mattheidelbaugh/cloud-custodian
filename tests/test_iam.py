@@ -1446,6 +1446,7 @@ class IamPolicy(BaseTest):
         p = self.load_policy({
             'name': 'delete-policy',
             'resource': 'iam-policy',
+            # Deprecated query format.  Use [{'Scope': 'Local'}] instead.
             'query': [{'Name': 'Scope', 'Value': 'Local'}],
             'filters': [
                 {'AttachmentCount': 0},
