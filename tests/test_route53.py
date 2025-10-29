@@ -226,7 +226,7 @@ class Route53HealthCheckTest(BaseTest):
 class Route53DomainTest(BaseTest):
 
     def test_route53_domain_auto_renew(self):
-        session_factory = self.record_flight_data("test_route53_domain")
+        session_factory = self.replay_flight_data("test_route53_domain")
         p = self.load_policy(
             {
                 "name": "r53domain-auto-renew",
@@ -239,7 +239,7 @@ class Route53DomainTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_route53_domain_transfer_lock(self):
-        session_factory = self.record_flight_data("test_route53_domain")
+        session_factory = self.replay_flight_data("test_route53_domain")
         p = self.load_policy(
             {
                 "name": "r53domain-transfer-lock",
@@ -252,7 +252,7 @@ class Route53DomainTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_route53_domain_add_tag(self):
-        session_factory = self.record_flight_data("test_route53_domain_add_tag")
+        session_factory = self.replay_flight_data("test_route53_domain_add_tag")
         p = self.load_policy(
             {
                 "name": "r53domain-add-tag",
@@ -271,7 +271,7 @@ class Route53DomainTest(BaseTest):
         self.assertEqual([tags[0]["Key"], tags[0]["Value"]], ["TestTag", "TestValue"])
 
     def test_route53_domain_remove_tag(self):
-        session_factory = self.record_flight_data("test_route53_domain_remove_tag")
+        session_factory = self.replay_flight_data("test_route53_domain_remove_tag")
         p = self.load_policy(
             {
                 "name": "r53domain-add-tag",
