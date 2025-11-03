@@ -836,7 +836,7 @@ class QueryParser:
     def parse_qfilters(cls, data):
         if not isinstance(data, (tuple, list)):
             raise PolicyValidationError(
-                f"{cls.type_name} Query Filter Invalid Format, must be array of dicts."
+                f"{cls.type_name} Query Filter Invalid Format, must be array of dicts"
             )
 
         results = []
@@ -844,7 +844,7 @@ class QueryParser:
         for f in data:
             if not isinstance(f, dict):
                 raise PolicyValidationError(
-                f"{cls.type_name} Query Filter Invalid Format, must be array of dicts."
+                f"{cls.type_name} Query Filter Invalid Format, must be array of dicts"
             )
             if "Name" not in f or "Values" not in f:
                 raise PolicyValidationError(
