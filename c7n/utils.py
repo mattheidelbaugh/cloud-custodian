@@ -898,8 +898,8 @@ class QueryParser:
 
         if key not in cls.QuerySchema:
             raise PolicyValidationError(
-                f"{cls.type_name} Query Invalid Key: {key} Valid: {', '.join(
-                    cls.QuerySchema.keys())}"
+                f"{cls.type_name} Query Invalid Key: {key} "
+                f"Valid: {', '.join(cls.QuerySchema.keys())}"
             )
 
         vtype = cls.QuerySchema.get(key)
