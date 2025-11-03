@@ -857,8 +857,8 @@ class QueryParser:
 
             if key not in cls.QuerySchema.get("Filters", {}) and not key.startswith('tag:'):
                 raise PolicyValidationError(
-                    f"{cls.type_name} Query Filter Invalid Key:{key} Valid: {', '.join(
-                        cls.QuerySchema.keys())}"
+                    f"{cls.type_name} Query Filter Invalid Key: {key} "
+                    f"Valid: {', '.join(cls.QuerySchema.keys())}"
                 )
 
             if not isinstance(values, list):
