@@ -796,7 +796,9 @@ class QueryParser:
                     )
 
             # Support ebs-snapshot and volume 'Name', 'Values' queries without 'Filters' key
-            elif data[0].get('Values') and (cls.type_name == 'EBS Snapshot' or cls.type_name == 'EBS Volume'):
+            elif (data[0].get('Values') and
+                  (cls.type_name == 'EBS Snapshot' or
+                   cls.type_name == 'EBS Volume')):
                 data = [{"Filters": data}]
 
         results = []
