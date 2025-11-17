@@ -113,19 +113,19 @@ class VolumeQueryParse(BaseTest):
         qfilters = [
             {'Name': 'tag:Name', 'Values': ['Volume1']},
             {'Name': 'status', 'Values': ['available']}]
-        self.assertEqual(qfilters, VolumeQueryParser.parse(qfilters))
+        self.assertEqual([{'Filters': qfilters}], VolumeQueryParser.parse(qfilters))
 
     def test_query_encrypted(self):
         qfilters = [
-            {'Name': 'encrypted', 'Values': [True]},
+            {'Name': 'encrypted', 'Values': ['true']},
             {'Name': 'volume-type', 'Values': ['gp3']}]
-        self.assertEqual(qfilters, VolumeQueryParser.parse(qfilters))
+        self.assertEqual([{'Filters': qfilters}], VolumeQueryParser.parse(qfilters))
 
     def test_query_attachment(self):
         qfilters = [
             {'Name': 'attachment.status', 'Values': ['attached']},
             {'Name': 'attachment.instance-id', 'Values': ['i-1234567890abcdef0']}]
-        self.assertEqual(qfilters, VolumeQueryParser.parse(qfilters))
+        self.assertEqual([{'Filters': qfilters}], VolumeQueryParser.parse(qfilters))
 
     def test_invalid_query(self):
         self.assertRaises(
@@ -1068,7 +1068,7 @@ class VolumeQueryFilterTest(BaseTest):
             "name": "ebs-query-test",
             "resource": "ebs",
             "query": [
-                {"Name": "encrypted", "Values": [True]},
+                {"Name": "encrypted", "Values": ['true']},
                 {"Name": "volume-type", "Values": ["gp3"]}
             ]
         })
@@ -1076,7 +1076,7 @@ class VolumeQueryFilterTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.data.get('query'),
             [
-                {"Name": "encrypted", "Values": [True]},
+                {"Name": "encrypted", "Values": ['true']},
                 {"Name": "volume-type", "Values": ["gp3"]}
             ]
         )
@@ -1086,7 +1086,7 @@ class VolumeQueryFilterTest(BaseTest):
             "name": "ebs-query-test",
             "resource": "ebs",
             "query": [
-                {"Name": "encrypted", "Values": [True]},
+                {"Name": "encrypted", "Values": ['true']},
                 {"Name": "volume-type", "Values": ["gp3"]},
                 {"Name": "status", "Values": ["available"]}
             ]
@@ -1108,7 +1108,7 @@ class VolumeQueryFilterTest(BaseTest):
                 "name": "ebs-encrypted-volumes",
                 "resource": "ebs",
                 "query": [
-                    {"Name": "encrypted", "Values": [True]},
+                    {"Name": "encrypted", "Values": ['true']},
                     {"Name": "volume-type", "Values": ["gp3"]}
                 ]
             },
