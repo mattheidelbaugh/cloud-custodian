@@ -63,6 +63,7 @@ class TestTransferServer(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
 
+
 class TestTransferUser(BaseTest):
 
     def test_resources(self):
