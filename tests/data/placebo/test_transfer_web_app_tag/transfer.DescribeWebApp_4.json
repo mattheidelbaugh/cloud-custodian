@@ -16,12 +16,7 @@
             "WebAppUnits": {
                 "Provisioned": 1
             },
-            "Tags": [
-                {
-                    "Key": "Environment",
-                    "Value": "Production"
-                }
-            ],
+            "Tags": [],
             "WebAppEndpointPolicy": "STANDARD"
         },
         "ResponseMetadata": {}

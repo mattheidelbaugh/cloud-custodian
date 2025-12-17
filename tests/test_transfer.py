@@ -152,7 +152,8 @@ class TestTransferWebApp(BaseTest):
                 "name": "transfer-web-app-test-untag",
                 "resource": "transfer-web-app",
                 "actions": [{"type": "remove-tag", "tags": ["Environment"]}],
-            }
+            },
+            session_factory=session_factory,
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
