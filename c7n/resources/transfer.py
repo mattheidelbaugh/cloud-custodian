@@ -30,7 +30,7 @@ class TransferServerSecurityGroupFilter(SecurityGroupFilter):
     boto3 docs for more details.
     """
 
-    RelatedIdsExpression = 'SecurityGroupsIds[]'
+    RelatedIdsExpression = 'EndpointDetails.SecurityGroupIds[]'
 
     def get_related_ids(self, resources):
 
@@ -44,7 +44,7 @@ class TransferServerSecurityGroupFilter(SecurityGroupFilter):
         for r in resources:
             endpoint_id = r.get('EndpointDetails', {}).get('VpcEndpointId')
             sg_ids = [sg['GroupId'] for sg in vpc_endpoint_sg_map.get(endpoint_id, [])]
-            r['SecurityGroupsIds'] = sg_ids
+            r['EndpointDetails']['SecurityGroupIds'] = sg_ids
         return super().get_related_ids(resources)
 
 
