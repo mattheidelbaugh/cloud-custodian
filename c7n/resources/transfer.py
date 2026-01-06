@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n.actions import BaseAction
-from c7n.filters.vpc import NetworkLocation, SecurityGroupFilter, SubnetFilter
 from c7n.manager import resources
 from concurrent.futures import as_completed
 from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo, ChildDescribeSource
@@ -179,53 +178,6 @@ class DeleteServer(BaseAction):
             client.delete_server(ServerId=server['ServerId'])
         except client.exceptions.ResourceNotFoundException:
             pass
-
-
-@resources.register('transfer-web-app')
-class TransferWebApp(QueryResourceManager):
-
-    class resource_type(TypeInfo):
-        service = 'transfer'
-        enum_spec = ('list_web_apps', 'WebApps', None)
-        detail_spec = (
-            'describe_web_app', 'WebAppId', 'WebAppId', 'WebApp')
-        id = name = 'WebAppId'
-        arn_type = "webapp"
-        cfn_type = 'AWS::Transfer::WebApp'
-        universal_taggable = object()
-
-
-@TransferWebApp.action_registry.register('delete')
-class DeleteWebApp(BaseAction):
-    """Action to delete a Transfer Web App
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: public-web-app-delete
-                resource: transfer-web-app
-                filters:
-                  - type: value
-                    key: EndpointType
-                    op: eq
-                    value: PUBLIC
-                actions:
-                  - delete
-    """
-    schema = type_schema('delete')
-    permissions = ("transfer:DeleteWebApp",)
-
-    def process(self, resources):
-        client = local_session(
-            self.manager.session_factory).client('transfer')
-        for r in resources:
-            self.manager.retry(
-                client.delete_web_app,
-                WebAppId=r['WebAppId'],
-                ignore_err_codes=['ResourceNotFoundException']
-            )
 
 
 class DescribeTransferUser(ChildDescribeSource):
