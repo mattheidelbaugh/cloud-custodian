@@ -68,7 +68,7 @@ class ResourceQuery:
             client = resource_manager.get_client()
         else:
             client = local_session(self.session_factory).client(
-                m.service, resource_manager.config.region)
+                m.service, resource_manager.region)
         enum_op, path, extra_args = m.enum_spec
         if extra_args:
             params = {**extra_args, **params}
@@ -267,7 +267,7 @@ class DescribeSource:
             client = self.manager.get_client()
         else:
             client = local_session(self.manager.session_factory).client(
-                model.service, region_name=self.manager.config.region)
+                model.service, region_name=self.manager.region)
         _augment = functools.partial(
             _augment, self.manager, model, detail_spec, client)
         with self.manager.executor_factory(
@@ -515,7 +515,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     def get_cache_key(self, query):
         return {
             'account': self.account_id,
-            'region': self.config.region,
+            'region': self.region,
             'resource': str(self.__class__.__name__),
             'source': self.source_type,
             'q': query
@@ -643,7 +643,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
             self._generate_arn = functools.partial(
                 generate_arn,
                 self.resource_type.arn_service or self.resource_type.service,
-                region=not self.resource_type.global_resource and self.config.region or "",
+                region=not self.resource_type.global_resource and self.region or "",
                 account_id=self.account_id,
                 resource_type=self.resource_type.arn_type,
                 separator=self.resource_type.arn_separator)
